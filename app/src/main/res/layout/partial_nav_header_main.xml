@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="com.baibus.medicalaccreditation.common.binding.ProgressBarFactory" alias="progress"/>
+        <import type="android.view.View" alias="view"/>
+        <variable name="viewModel" type="com.baibus.medicalaccreditation.main.MainVM"/>
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/nav_header_height"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            fresco:progressBarImage="@{progress.newInstance(0x800080FF)}"
+            fresco:placeholderImage="@drawable/side_nav_bar"
+            fresco:roundAsCircle="false"
+            bind:imageURI='@{viewModel.specialization.filePath}'/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/textUser"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text='@{viewModel.specialization.name}'
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            tools:text="Специализация"/>
+
+        <TextView
+            android:id="@+id/textUser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="@dimen/nav_header_vertical_spacing"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:text='@{viewModel.user.name}'
+            tools:text="Иванов Иван"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</layout>

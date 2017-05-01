@@ -1,0 +1,145 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.1'
+        classpath 'gradle.plugin.me.tatarka:gradle-retrolambda:3.5.0'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+
+//     Workaround for preventing Gradle from stealing focus from other apps
+//     https://gist.github.com/artem-zinnatullin/4c250e04636e25797165
+    tasks.withType(JavaForkOptions) {
+        jvmArgs '-Djava.awt.headless=true'
+    }
+}
+
+
+ext {
+    buildToolsVersion = '25.0.3'
+    compileSdkVersion = 25
+    minSdkVersion = 16
+}
+
+def supportLibsVersion = '25.3.1'
+def bindingCollectionAdapterVersion = '2.0.1'
+def storIOSQLiteVersion = '1.12.3'
+def parcelerVersion = '1.1.6'
+def leakCanaryVersion = '1.5'
+
+ext.libraries = [
+
+        //support
+        constraintLayout                            : 'com.android.support.constraint:constraint-layout:1.0.2',
+        supportAnnotations                          : 'com.android.support:support-annotations:' + supportLibsVersion,
+        appCompat                                   : 'com.android.support:appcompat-v7:' + supportLibsVersion,
+        supportV4                                   : 'com.android.support:support-v4:' + supportLibsVersion,
+        recyclerView                                : 'com.android.support:recyclerview-v7:' + supportLibsVersion,
+        design                                      : 'com.android.support:design:' + supportLibsVersion,
+        cardView                                    : 'com.android.support:cardview-v7:' + supportLibsVersion,
+
+        //network
+        retrofit                                    : 'com.squareup.retrofit2:retrofit:2.1.0',
+        retrofitConverterGson                       : 'com.squareup.retrofit2:converter-gson:2.0.0',
+        retrofitRxAdapter                           : 'com.squareup.retrofit2:adapter-rxjava:2.0.0',
+        okHttp                                      : 'com.squareup.okhttp3:logging-interceptor:3.4.0',
+        stetho                                      : 'com.facebook.stetho:stetho-okhttp3:1.5.0',
+
+        //imaging
+        fresco                                      : 'com.facebook.fresco:fresco:1.3.0',
+
+        //Rx
+        rxJava                                      : 'io.reactivex:rxjava:1.2.7',
+        rxAndroid                                   : 'io.reactivex:rxandroid:1.2.1',
+        rxPermissions                               : 'com.tbruyelle.rxpermissions:rxpermissions:0.9.3@aar',
+        bindingCollectionAdapter                    : 'me.tatarka.bindingcollectionadapter2:bindingcollectionadapter:' + bindingCollectionAdapterVersion,
+        bindingCollectionAdapterRecyclerView        : 'me.tatarka.bindingcollectionadapter2:bindingcollectionadapter-recyclerview:' + bindingCollectionAdapterVersion,
+
+        //database
+        storIOSQLite                                : 'com.pushtorefresh.storio:sqlite:' + storIOSQLiteVersion,
+        storIOSQLiteAnnotations                     : 'com.pushtorefresh.storio:sqlite-annotations:' + storIOSQLiteVersion,
+        storIOSQLiteAnnotationsProcessor            : 'com.pushtorefresh.storio:sqlite-annotations-processor:' + storIOSQLiteVersion,
+
+        //serialization
+        gson                                        : 'com.google.code.gson:gson:2.8.0',
+
+        //parceler
+        parceler                                    : 'org.parceler:parceler-api:' + parcelerVersion,
+        parcelerAnnotationProcessor                 : 'org.parceler:parceler:' + parcelerVersion,
+
+        //LeakCanary
+        leakCanary                                  : 'com.squareup.leakcanary:leakcanary-android:' + leakCanaryVersion,
+        leakCanaryNoOp                              : 'com.squareup.leakcanary:leakcanary-android-no-op:' + leakCanaryVersion,
+
+        //logger
+        timber                                      : 'com.jakewharton.timber:timber:3.0.1',
+
+        //Libraries for tests
+        junit                                       : 'junit:junit:4.12',
+        espresso                                    : 'com.android.support.test.espresso:espresso-core:2.2.2',
+        excludeGroup                                : 'com.android.support',
+        excludeModule                               : 'support-annotations',
+//        assertJ                                     : 'org.assertj:assertj-core:3.6.2',
+//        assertJAndroid                              : 'com.squareup.assertj:assertj-android:1.1.1',
+//        mockitoCore                                 : 'org.mockito:mockito-core:2.7.19',
+//
+//        equalsVerifier                              : 'nl.jqno.equalsverifier:equalsverifier:1.7.2',
+//        privateConstructorChecker                   : 'com.pushtorefresh.java-private-constructor-checker:checker:1.1.0',
+//        guava                                       : 'com.google.guava:guava:18.0',
+//        robolectric                                 : 'org.robolectric:robolectric:3.3.2',
+//        googleTestingCompile                        : 'com.google.testing.compile:compile-testing:0.10',
+//
+//        autoService                                 : 'com.google.auto.service:auto-service:1.0-rc2',
+//        javaPoet                                    : 'com.squareup:javapoet:1.8.0',
+//        intellijAnnotations                         : 'com.intellij:annotations:12.0'
+
+]
+
+// Option to disable Pre-Dexing on CI env
+project.ext.preDexLibs = !project.hasProperty('disablePreDex')
+
+subprojects {
+
+    project.plugins.whenPluginAdded { plugin ->
+        if ('com.android.build.gradle.AppPlugin' == plugin.class.name
+                || 'com.android.build.gradle.LibraryPlugin' == plugin.class.name) {
+
+            // enable or disable pre-dexing
+            project.android.dexOptions.preDexLibraries = rootProject.ext.preDexLibs
+
+            // treat all Android Lint warning in all sub-projects as errors
+            project.android.lintOptions.warningsAsErrors = true
+
+            // StorIO should support Java 6
+            project.android.compileOptions.sourceCompatibility = JavaVersion.VERSION_1_6
+            project.android.compileOptions.targetCompatibility = JavaVersion.VERSION_1_6
+
+            project.android.testOptions.unitTests.all {
+                testLogging {
+                    events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+                    exceptionFormat 'full'
+                }
+            }
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

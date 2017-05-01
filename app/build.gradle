@@ -1,0 +1,117 @@
+apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+        applicationId "com.baibus.medicalaccreditation"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.compileSdkVersion
+        versionCode 1
+        versionName "1.0.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('keystore_debug.jks')
+            storePassword 'keystore password'
+            keyAlias 'alias app'
+            keyPassword 'app password'
+        }
+        release {
+            storeFile file('keystore_release.jks')
+            storePassword 'keystore password'
+            keyAlias 'alias app'
+            keyPassword 'app password'
+        }
+    }
+
+    buildTypes {
+        debug {
+//            signingConfig signingConfigs.debug
+            testCoverageEnabled false
+            applicationIdSuffix ".debug"
+        }
+        release {
+//            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationIdSuffix ".release"
+        }
+    }
+
+    lintOptions {
+        disable 'GoogleAppIndexingWarning'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    dataBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+    //tests
+    androidTestCompile(libraries.espresso, {
+        exclude group: libraries.excludeGroup, module: libraries.espressoModule
+    })
+    testCompile libraries.junit
+
+    //support
+    compile libraries.supportV4
+    compile libraries.constraintLayout
+    compile libraries.supportAnnotations
+    compile libraries.appCompat
+    compile libraries.recyclerView
+    compile libraries.design
+    compile libraries.cardView
+
+    //network
+    compile libraries.retrofit
+    compile libraries.retrofitConverterGson
+    compile libraries.retrofitRxAdapter
+    compile libraries.okHttp
+    compile libraries.stetho
+
+    //imaging
+    compile libraries.fresco
+
+    //Rx
+    compile libraries.rxJava
+    compile libraries.rxAndroid
+    compile libraries.rxPermissions
+    compile libraries.bindingCollectionAdapter
+    compile libraries.bindingCollectionAdapterRecyclerView
+
+    //database
+    compile libraries.storIOSQLite
+    compile libraries.storIOSQLiteAnnotations
+    annotationProcessor libraries.storIOSQLiteAnnotationsProcessor
+
+    //serialization
+    compile libraries.gson
+
+    //parceler
+    compile libraries.parceler
+    annotationProcessor libraries.parcelerAnnotationProcessor
+
+    //LeakCanary
+    debugCompile libraries.leakCanary
+    releaseCompile libraries.leakCanaryNoOp
+    testCompile libraries.leakCanaryNoOp
+
+    //logger
+    compile libraries.timber
+
+}
+
+retrolambda {
+    javaVersion JavaVersion.VERSION_1_7
+    jvmArgs '-noverify'
+}
