@@ -16,7 +16,6 @@ import com.baibus.medicalaccreditation.databinding.ActivityAuthBinding;
 
 public class AuthActivity extends Activity<AuthActivity, ActivityAuthBinding, AuthVM, AuthVM.FactoryVM> {
 
-
     public static Intent getStartIntent() {
         return new Intent(MedApplication.getInstance(), AuthActivity.class);
     }
@@ -61,6 +60,12 @@ public class AuthActivity extends Activity<AuthActivity, ActivityAuthBinding, Au
 
     @Override
     protected void onRestoredVM() {
+        setupActionBar();
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        super.onBackStackChanged();
         setupActionBar();
     }
 

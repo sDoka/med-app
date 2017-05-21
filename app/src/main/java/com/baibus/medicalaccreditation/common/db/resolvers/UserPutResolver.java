@@ -31,7 +31,7 @@ public class UserPutResolver extends DefaultPutResolver<User> {
     protected UpdateQuery mapToUpdateQuery(@NonNull User object) {
         return UpdateQuery.builder()
                 .table(UserTable.TABLE)
-                .where("id = ?")
+                .where(UserTable.COLUMN_ID + " = ?")
                 .whereArgs(object.getId())
                 .build();
     }
@@ -44,6 +44,8 @@ public class UserPutResolver extends DefaultPutResolver<User> {
         contentValues.put(UserTable.COLUMN_ID, object.getId());
         contentValues.put(UserTable.COLUMN_NAME, object.getName());
         contentValues.put(UserTable.COLUMN_EMAIL, object.getEmail());
+        contentValues.put(UserTable.COLUMN_LAST_SYNCHRONIZATION, object.getLastSynchronization().getTime());
+        contentValues.put(UserTable.COLUMN_DEVICE_ID, object.getDeviceId());
 
         return contentValues;
     }

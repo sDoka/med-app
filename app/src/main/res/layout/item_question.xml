@@ -52,7 +52,7 @@
                         fresco:roundedCornerRadius="40dp"
                         fresco:roundBottomLeft="false"
                         fresco:roundBottomRight="false"
-                        fresco:progressBarImage="@{progress.newInstance(0x800080FF)}"
+                        bind:progressBarImage="@{progress.newInstance(0x800080FF)}"
                         bind:imageURI='@{itemViewModel.question.filePath}'/>
 
                 </com.baibus.medicalaccreditation.common.ui.custom.SquareFrameLayout>
@@ -75,15 +75,14 @@
                 <android.support.v7.widget.RecyclerView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    bind:nestedScrollingEnabled='@{true}'
-                    app:layoutManager="@{LayoutManagers.linear()}"
-                    app:itemBinding="@{itemViewModel.itemBinding}"
                     app:items="@{itemViewModel.answers}"
-                    app:itemIds="@{itemViewModel.itemIds}"
+                    app:itemBinding="@{itemViewModel.itemBinding}"
+                    app:layoutManager="@{LayoutManagers.linear()}"
                     app:hasFixedSize="@{true}"
                     app:itemDivider="@{DividerItemDecoration.newInstance(R.drawable.divider)}"
                     app:startOffset="@{StartOffsetItemDecoration.newInstanceDimen(R.dimen.start_offset)}"
                     app:endOffset="@{EndOffsetItemDecoration.newInstanceDimen(R.dimen.end_offset)}"
+                    bind:nestedScrollingEnabled='@{true}'
                     tools:listitem="@layout/item_answer"
                     tools:layout_height="600dp"/>
             </LinearLayout>

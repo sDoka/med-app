@@ -9,7 +9,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.1'
+        classpath 'com.android.tools.build:gradle:2.3.2'
         classpath 'gradle.plugin.me.tatarka:gradle-retrolambda:3.5.0'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -41,7 +41,8 @@ def supportLibsVersion = '25.3.1'
 def bindingCollectionAdapterVersion = '2.0.1'
 def storIOSQLiteVersion = '1.12.3'
 def parcelerVersion = '1.1.6'
-def leakCanaryVersion = '1.5'
+def leakCanaryVersion = '1.5.1'
+def okHttpVersion = '3.8.0'
 
 ext.libraries = [
 
@@ -58,7 +59,8 @@ ext.libraries = [
         retrofit                                    : 'com.squareup.retrofit2:retrofit:2.1.0',
         retrofitConverterGson                       : 'com.squareup.retrofit2:converter-gson:2.0.0',
         retrofitRxAdapter                           : 'com.squareup.retrofit2:adapter-rxjava:2.0.0',
-        okHttp                                      : 'com.squareup.okhttp3:logging-interceptor:3.4.0',
+        okHttp                                      : 'com.squareup.okhttp3:logging-interceptor:' + okHttpVersion,
+        okHttpMock                                  : 'com.squareup.okhttp3:mockwebserver:' + okHttpVersion,
         stetho                                      : 'com.facebook.stetho:stetho-okhttp3:1.5.0',
 
         //imaging
@@ -92,9 +94,10 @@ ext.libraries = [
 
         //Libraries for tests
         junit                                       : 'junit:junit:4.12',
-        espresso                                    : 'com.android.support.test.espresso:espresso-core:2.2.2',
-        excludeGroup                                : 'com.android.support',
-        excludeModule                               : 'support-annotations',
+//        espresso                                    : 'com.android.support.test.espresso:espresso-core:2.2.2',
+//        excludeGroup                                : 'com.android.support',
+//        excludeModule                               : 'support-annotations',
+
 //        assertJ                                     : 'org.assertj:assertj-core:3.6.2',
 //        assertJAndroid                              : 'com.squareup.assertj:assertj-android:1.1.1',
 //        mockitoCore                                 : 'org.mockito:mockito-core:2.7.19',

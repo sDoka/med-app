@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 
 import com.baibus.medicalaccreditation.base.ActivityVM;
 import com.baibus.medicalaccreditation.base.ActivityVMFactory;
@@ -12,14 +11,11 @@ import com.baibus.medicalaccreditation.base.ActivityVMFactory;
 public class AuthVM extends ActivityVM<AuthActivity> {
     private final static String TAG = AuthVM.class.getSimpleName();
 
-    private final FragmentManager.OnBackStackChangedListener mBackStackChangedListener = activity::setupActionBar;
-
     private AuthVM(AuthActivity activity, @Nullable Bundle savedInstanceState) {
         super(activity, savedInstanceState);
         if (savedInstanceState == null) {
             removeAllAndReplaceFragments(LoginFragment.newInstance(), LoginFragment.TAG);
         }
-        activity.getSupportFragmentManager().addOnBackStackChangedListener(mBackStackChangedListener);
     }
 
     @Override
@@ -30,7 +26,6 @@ public class AuthVM extends ActivityVM<AuthActivity> {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        activity.getSupportFragmentManager().removeOnBackStackChangedListener(mBackStackChangedListener);
     }
 
     @Override

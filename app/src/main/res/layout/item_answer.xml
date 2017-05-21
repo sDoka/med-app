@@ -34,7 +34,7 @@
                 android:layout_height="match_parent"
                 fresco:placeholderImage="@drawable/side_nav_bar"
                 fresco:roundAsCircle="false"
-                fresco:progressBarImage="@{progress.newInstance(0x800080FF)}"
+                bind:progressBarImage="@{progress.newInstance(0x800080FF)}"
                 bind:imageURI='@{itemViewModel.filePath}'/>
 
         </com.baibus.medicalaccreditation.common.ui.custom.SquareFrameLayout>

@@ -38,7 +38,7 @@ public abstract class Activity<C extends Activity, B extends ViewDataBinding, VM
 	private final CompositeSubscription mCompositeSubscription = Subscriptions.from();
 	public B binding;
 	public VM viewModel;
-	protected final Handler mainHandler = new Handler();
+	public final Handler mainHandler = new Handler();
 	
 	protected abstract @IdRes int getVariable();
 	protected abstract @LayoutRes int getLayoutId();
@@ -58,8 +58,16 @@ public abstract class Activity<C extends Activity, B extends ViewDataBinding, VM
 	}
 
 	public final void resetViewModel() {
+		viewModel.onPause();
+		viewModel.onStop();
+		viewModel.onDestroy();
 		viewModel = onCreate();
+		onCreatedVM();
+		viewModel.onPostCreate(null);
+		viewModel.onStart();
+		viewModel.onResume();
 		binding.setVariable(getVariable(), viewModel);
+		supportInvalidateOptionsMenu();
 	}
 
 	public CoordinatorLayout coordinatorLayout() {
@@ -154,6 +162,10 @@ public abstract class Activity<C extends Activity, B extends ViewDataBinding, VM
 		}
 		binding.unbind();
 		binding = null;
+		MedApplication.getInstance().refWatcher().watch(this);
+		if (viewModel != null) {
+			MedApplication.getInstance().refWatcher().watch(viewModel);
+		}
 	}
 
 	@Override
@@ -287,8 +299,6 @@ public abstract class Activity<C extends Activity, B extends ViewDataBinding, VM
 			viewModel = onRestore(savedInstanceState);
 			onRestoredVM();
 		}
-		MedApplication.getInstance().refWatcher().watch(this);
-		MedApplication.getInstance().refWatcher().watch(viewModel);
 		binding.setVariable(getVariable(), viewModel);
 		binding.executePendingBindings();
 		getSupportFragmentManager().addOnBackStackChangedListener(this);

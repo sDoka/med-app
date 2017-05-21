@@ -32,7 +32,6 @@ class OkHttpProvider {
 
     private final static long CONNECT_TIMEOUT_SECOND = 60;
     private final static long READ_TIMEOUT_SECOND = 60;
-    private final static long WRITE_TIMEOUT_SECOND = 60;
 
 
     private static volatile OkHttpClient instance;
@@ -49,7 +48,7 @@ class OkHttpProvider {
                             .addNetworkInterceptor(new StethoInterceptor())
                             .connectTimeout(CONNECT_TIMEOUT_SECOND, TimeUnit.SECONDS)
                             .readTimeout(READ_TIMEOUT_SECOND, TimeUnit.SECONDS)
-                            .writeTimeout(WRITE_TIMEOUT_SECOND, TimeUnit.SECONDS)
+                            //.protocols(Collections.singletonList(Protocol.HTTP_1_0))
                             .build();
                 }
             }

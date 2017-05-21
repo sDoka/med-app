@@ -42,9 +42,18 @@ public abstract class Fragment<C extends Fragment, B extends ViewDataBinding, VM
     }
 
     public final void resetViewModel() {
+        viewModel.onPause();
+        viewModel.onStop();
+        viewModel.onDestroyView();
+        viewModel.onDestroy();
         viewModel = onCreate();
         onCreatedVM();
+        viewModel.onViewCreated();
+        viewModel.onActivityCreated(null);
+        viewModel.onStart();
+        viewModel.onResume();
         binding.setVariable(getVariable(), viewModel);
+        getActivity().supportInvalidateOptionsMenu();
     }
     
     @Override
@@ -63,8 +72,6 @@ public abstract class Fragment<C extends Fragment, B extends ViewDataBinding, VM
             viewModel = onRestore(savedInstanceState);
             onRestoredVM();
         }
-        MedApplication.getInstance().refWatcher().watch(this);
-        MedApplication.getInstance().refWatcher().watch(viewModel);
         binding.setVariable(getVariable(), viewModel);
         binding.executePendingBindings();
         return binding.getRoot();
@@ -74,6 +81,12 @@ public abstract class Fragment<C extends Fragment, B extends ViewDataBinding, VM
     public final void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel.onViewCreated();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        viewModel.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -119,6 +132,10 @@ public abstract class Fragment<C extends Fragment, B extends ViewDataBinding, VM
         if (viewModel != null) {
             viewModel.onDestroy();
         }
+        MedApplication.getInstance().refWatcher().watch(this);
+        if (viewModel != null) {
+            MedApplication.getInstance().refWatcher().watch(viewModel);
+        }
     }
 
     @Override
@@ -136,9 +153,6 @@ public abstract class Fragment<C extends Fragment, B extends ViewDataBinding, VM
         }
         super.onViewStateRestored(savedInstanceState);
     }
-
-
-
 
     @Override
     public final void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

@@ -2,6 +2,7 @@ package com.baibus.medicalaccreditation.common.db.tables;
 
 import android.support.annotation.NonNull;
 
+import com.pushtorefresh.storio.sqlite.queries.DeleteQuery;
 import com.pushtorefresh.storio.sqlite.queries.Query;
 
 /**
@@ -19,7 +20,7 @@ public class QuestionTable {
     public static final String TABLE = "question";
 
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_INDEX = "index";
+    public static final String COLUMN_INDEX = "sequence";
     public static final String COLUMN_SPECIALIZATION_ID = "specializationId";
     public static final String COLUMN_TEXT = "text";
     public static final String COLUMN_FILE_PATH = "filePath";
@@ -35,6 +36,14 @@ public class QuestionTable {
                 .table(TABLE)
                 .where(COLUMN_ID + " = ?")
                 .whereArgs(id)
+                .build();
+    }
+
+    public static @NonNull DeleteQuery deleteIds(String ids) {
+        return DeleteQuery.builder()
+                .table(TABLE)
+                .where(COLUMN_ID + " IN (?)")
+                .whereArgs(ids)
                 .build();
     }
 

@@ -2,6 +2,7 @@ package com.baibus.medicalaccreditation.common.db.tables;
 
 import android.support.annotation.NonNull;
 
+import com.pushtorefresh.storio.sqlite.queries.DeleteQuery;
 import com.pushtorefresh.storio.sqlite.queries.Query;
 
 /**
@@ -25,6 +26,11 @@ public class SpecializationTable {
     // Yep, with StorIO you can safely store queries as objects and reuse them, they are immutable
     @NonNull
     public static final Query QUERY_ALL = Query.builder()
+            .table(TABLE)
+            .build();
+
+    @NonNull
+    public static final DeleteQuery DELETE_ALL = DeleteQuery.builder()
             .table(TABLE)
             .build();
 

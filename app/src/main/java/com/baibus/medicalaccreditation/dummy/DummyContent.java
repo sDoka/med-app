@@ -1,72 +1,179 @@
 package com.baibus.medicalaccreditation.dummy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Helper class for providing sample content for user interfaces created by
- * Android template wizards.
- * <p>
- * TODO: Replace all uses of this class before publishing your app.
- */
 public class DummyContent {
 
-    /**
-     * An array of sample (dummy) items.
-     */
-    public static final List<DummyItem> ITEMS = new ArrayList<DummyItem>();
+    public static String SPECIALIZATIONS = "{\n" +
+            "  \"responseCode\" : 200,\n" +
+            "  \"responseStatus\" : \"success\",\n" +
+            "  \"responseError\" : null,\n" +
+            "  \"responseBody\" : [\n" +
+            "    {\n" +
+            "      \"id\": 1,\n" +
+            "      \"name\": \"Dummy Spec 1\",\n" +
+            "      \"questionFilePath\": \"http://denta-lain.ru/img/logozub.png\"\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"id\": 2,\n" +
+            "      \"name\": \"Dummy Spec 2\",\n" +
+            "      \"questionFilePath\": \"http://leshaigraet.ru/wp-content/uploads/2015/09/m.png\"\n" +
+            "    }\n" +
+            "  ]\n" +
+            "}";
+    public static String QUESTIONS = "{\n" +
+            "  \"responseCode\" : 200,\n" +
+            "  \"responseStatus\" : \"success\",\n" +
+            "  \"responseError\" : null,\n" +
+            "  \"responseBody\" : [\n" +
+            "    {\n" +
+            "      \"questionId\": 1,\n" +
+            "      \"questionIndex\": 1,\n" +
+            "      \"questionSpecializationId\": 1,\n" +
+            "      \"questionText\": \"Dummy Question 1\",\n" +
+            "      \"questionFilePath\": null,\n" +
+            "      \"answers\": [\n" +
+            "        {\n" +
+            "          \"id\": 1,\n" +
+            "          \"questionId\": 1,\n" +
+            "          \"text\": \"Dummy Answer 1\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": true\n" +
+            "        },\n" +
+            "        {\n" +
+            "          \"id\": 2,\n" +
+            "          \"questionId\": 1,\n" +
+            "          \"text\": \"Dummy Answer 2\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": false\n" +
+            "        },\n" +
+            "        {\n" +
+            "          \"id\": 3,\n" +
+            "          \"questionId\": 1,\n" +
+            "          \"text\": \"Dummy Answer 3\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": false\n" +
+            "        },\n" +
+            "        {\n" +
+            "          \"id\": 4,\n" +
+            "          \"questionId\": 1,\n" +
+            "          \"text\": \"Dummy Answer 4\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": false\n" +
+            "        }\n" +
+            "      ]\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"questionId\": 2,\n" +
+            "      \"questionIndex\": 2,\n" +
+            "      \"questionSpecializationId\": 1,\n" +
+            "      \"questionText\": \"Dummy Question 2\",\n" +
+            "      \"questionFilePath\": null,\n" +
+            "      \"answers\": [\n" +
+            "        {\n" +
+            "          \"id\": 5,\n" +
+            "          \"questionId\": 2,\n" +
+            "          \"text\": \"Dummy Answer 1\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": true\n" +
+            "        },\n" +
+            "        {\n" +
+            "          \"id\": 6,\n" +
+            "          \"questionId\": 2,\n" +
+            "          \"text\": \"Dummy Answer 2\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": false\n" +
+            "        },\n" +
+            "        {\n" +
+            "          \"id\": 7,\n" +
+            "          \"questionId\": 2,\n" +
+            "          \"text\": \"Dummy Answer 3\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": false\n" +
+            "        },\n" +
+            "        {\n" +
+            "          \"id\": 8,\n" +
+            "          \"questionId\": 2,\n" +
+            "          \"text\": \"Dummy Answer 4\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": false\n" +
+            "        }\n" +
+            "      ]\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"questionId\": 3,\n" +
+            "      \"questionIndex\": 1,\n" +
+            "      \"questionSpecializationId\": 2,\n" +
+            "      \"questionText\": \"Dummy Question 1\",\n" +
+            "      \"questionFilePath\": null,\n" +
+            "      \"answers\": [\n" +
+            "        {\n" +
+            "          \"id\": 9,\n" +
+            "          \"questionId\": 3,\n" +
+            "          \"text\": \"Dummy Answer 1\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": true\n" +
+            "        },\n" +
+            "        {\n" +
+            "          \"id\": 10,\n" +
+            "          \"questionId\": 3,\n" +
+            "          \"text\": \"Dummy Answer 2\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": false\n" +
+            "        },\n" +
+            "        {\n" +
+            "          \"id\": 11,\n" +
+            "          \"questionId\": 3,\n" +
+            "          \"text\": \"Dummy Answer 3\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": false\n" +
+            "        },\n" +
+            "        {\n" +
+            "          \"id\": 12,\n" +
+            "          \"questionId\": 3,\n" +
+            "          \"text\": \"Dummy Answer 4\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": false\n" +
+            "        }\n" +
+            "      ]\n" +
+            "    },\n" +
+            "    {\n" +
+            "      \"questionId\": 4,\n" +
+            "      \"questionIndex\": 1,\n" +
+            "      \"questionSpecializationId\": 2,\n" +
+            "      \"questionText\": \"Dummy Question 2\",\n" +
+            "      \"questionFilePath\": null,\n" +
+            "      \"answers\": [\n" +
+            "        {\n" +
+            "          \"id\": 13,\n" +
+            "          \"questionId\": 4,\n" +
+            "          \"text\": \"Dummy Answer 1\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": true\n" +
+            "        },\n" +
+            "        {\n" +
+            "          \"id\": 14,\n" +
+            "          \"questionId\": 4,\n" +
+            "          \"text\": \"Dummy Answer 2\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": false\n" +
+            "        },\n" +
+            "        {\n" +
+            "          \"id\": 15,\n" +
+            "          \"questionId\": 4,\n" +
+            "          \"text\": \"Dummy Answer 3\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": false\n" +
+            "        },\n" +
+            "        {\n" +
+            "          \"id\": 16,\n" +
+            "          \"questionId\": 4,\n" +
+            "          \"text\": \"Dummy Answer 4\",\n" +
+            "          \"filePath\": null,\n" +
+            "          \"correct\": false\n" +
+            "        }\n" +
+            "      ]\n" +
+            "    }\n" +
+            "  ]\n" +
+            "}";
+    public static String EMPTY = "";
 
-    /**
-     * A map of sample (dummy) items, by ID.
-     */
-    public static final Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
-
-    private static final int COUNT = 25;
-
-    static {
-        // Add some sample items.
-        for (int i = 1; i <= COUNT; i++) {
-            addItem(createDummyItem(i));
-        }
-    }
-
-    private static void addItem(DummyItem item) {
-        ITEMS.add(item);
-        ITEM_MAP.put(item.id, item);
-    }
-
-    private static DummyItem createDummyItem(int position) {
-        return new DummyItem(String.valueOf(position), "Item " + position, makeDetails(position));
-    }
-
-    private static String makeDetails(int position) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Details about Item: ").append(position);
-        for (int i = 0; i < position; i++) {
-            builder.append("\nMore details information here.");
-        }
-        return builder.toString();
-    }
-
-    /**
-     * A dummy item representing a piece of content.
-     */
-    public static class DummyItem {
-        public final String id;
-        public final String content;
-        public final String details;
-
-        public DummyItem(String id, String content, String details) {
-            this.id = id;
-            this.content = content;
-            this.details = details;
-        }
-
-        @Override
-        public String toString() {
-            return content;
-        }
-    }
 }

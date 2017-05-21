@@ -3,6 +3,8 @@ package com.baibus.medicalaccreditation.common.db.entities;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.google.gson.annotations.SerializedName;
+
 import org.parceler.Parcel;
 import org.parceler.ParcelConstructor;
 
@@ -16,11 +18,14 @@ import org.parceler.ParcelConstructor;
 @Parcel(Parcel.Serialization.BEAN)
 public class Specialization {
 
+    @SerializedName("id")
     private final long mId;
 
+    @SerializedName("name")
     @NonNull
     private final String mName;
 
+    @SerializedName("filePath")
     @NonNull
     private final String mFilePath;
 
@@ -32,7 +37,7 @@ public class Specialization {
     }
 
     @NonNull
-    public static Specialization newSpecialization(long id, @NonNull String name, @NonNull String filePath) {
+    public static Specialization newInstance(long id, @NonNull String name, @NonNull String filePath) {
         return new Specialization(id, name, filePath);
     }
 

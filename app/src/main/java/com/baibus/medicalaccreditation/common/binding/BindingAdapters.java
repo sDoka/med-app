@@ -4,28 +4,22 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.databinding.BindingAdapter;
-import android.databinding.InverseBindingAdapter;
-import android.databinding.InverseBindingListener;
 import android.databinding.adapters.ListenerUtil;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.AppCompatSpinner;
-import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.baibus.medicalaccreditation.R;
 import com.baibus.medicalaccreditation.databinding.PartialNavHeaderMainBinding;
 import com.baibus.medicalaccreditation.main.MainVM;
-import com.facebook.drawee.drawable.ProgressBarDrawable;
-import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.lang.ref.WeakReference;
@@ -85,6 +79,11 @@ public class BindingAdapters {
         alpha.start();
     }
 
+    @BindingAdapter({"progressBarImage"})
+    public static void bindProgressBarImage(SimpleDraweeView view, Drawable progressBarImage) {
+        view.getHierarchy().setProgressBarImage(progressBarImage);
+    }
+
     @BindingAdapter({"model"})
     public static void loadHeader(NavigationView view, MainVM model) {
         PartialNavHeaderMainBinding binding =
@@ -105,8 +104,8 @@ public class BindingAdapters {
     }
 
     @BindingAdapter("errorText")
-    public static void setError(TextView textView, CharSequence error) {
-        textView.setError(error);
+    public static void bindError(EditText view, CharSequence error) {
+        view.setError(error);
     }
 
     private static class VisibilityAnimatorListenerAdapter extends AnimatorListenerAdapter {

@@ -14,20 +14,20 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
-    signingConfigs {
-        debug {
-            storeFile file('keystore_debug.jks')
-            storePassword 'keystore password'
-            keyAlias 'alias app'
-            keyPassword 'app password'
-        }
-        release {
-            storeFile file('keystore_release.jks')
-            storePassword 'keystore password'
-            keyAlias 'alias app'
-            keyPassword 'app password'
-        }
-    }
+//    signingConfigs {
+//        debug {
+//            storeFile file('keystore_debug.jks')
+//            storePassword 'keystore password'
+//            keyAlias 'alias app'
+//            keyPassword 'app password'
+//        }
+//        release {
+//            storeFile file('keystore_release.jks')
+//            storePassword 'keystore password'
+//            keyAlias 'alias app'
+//            keyPassword 'app password'
+//        }
+//    }
 
     buildTypes {
         debug {
@@ -41,6 +41,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             applicationIdSuffix ".release"
         }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/LICENSE'
+    }
+
+    dexOptions {
+        jumboMode true
     }
 
     lintOptions {
@@ -57,10 +68,11 @@ android {
 }
 
 dependencies {
-    //tests
-    androidTestCompile(libraries.espresso, {
-        exclude group: libraries.excludeGroup, module: libraries.espressoModule
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
     })
+
     testCompile libraries.junit
 
     //support
@@ -77,6 +89,7 @@ dependencies {
     compile libraries.retrofitConverterGson
     compile libraries.retrofitRxAdapter
     compile libraries.okHttp
+    compile libraries.okHttpMock
     compile libraries.stetho
 
     //imaging
@@ -102,6 +115,7 @@ dependencies {
     annotationProcessor libraries.parcelerAnnotationProcessor
 
     //LeakCanary
+//    compile libraries.leakCanaryNoOp
     debugCompile libraries.leakCanary
     releaseCompile libraries.leakCanaryNoOp
     testCompile libraries.leakCanaryNoOp

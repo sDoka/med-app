@@ -31,7 +31,7 @@ public class QuestionPutResolver extends DefaultPutResolver<Question> {
     protected UpdateQuery mapToUpdateQuery(@NonNull Question object) {
         return UpdateQuery.builder()
                 .table(QuestionTable.TABLE)
-                .where("id = ?")
+                .where(QuestionTable.COLUMN_ID + " = ?")
                 .whereArgs(object.getId())
                 .build();
     }

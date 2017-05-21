@@ -15,6 +15,8 @@ public abstract class FragmentVM<F extends Fragment> extends BaseObservable {
 
     private final static String BUNDLE_IS_SHOW_PROGRESS = "isShowProgress";
 
+    private boolean mActivityCreated = false;
+
     protected F fragment;
 
     protected CharSequence title;
@@ -44,6 +46,17 @@ public abstract class FragmentVM<F extends Fragment> extends BaseObservable {
 
     public void onViewCreated() {
 
+    }
+
+    public boolean isActivityCreated() {
+        return mActivityCreated;
+    }
+
+    /**
+     * Fragment lifecycle
+     */
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        mActivityCreated = true;
     }
 
     public void onStart() {

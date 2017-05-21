@@ -1,5 +1,7 @@
 package com.baibus.medicalaccreditation.common.network;
 
+import android.text.TextUtils;
+
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -8,11 +10,9 @@ import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.HttpException;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import rx.Observable;
 import rx.Scheduler;
-import rx.functions.Func1;
 
 /**
  * Created by Android Studio.
@@ -44,10 +44,11 @@ public class RxErrorHandlingCallAdapterFactory extends CallAdapter.Factory {
     }
 
     private static class RxCallAdapterWrapper implements CallAdapter<Observable<?>> {
+        @SuppressWarnings("unused")
         private final Retrofit retrofit;
         private final CallAdapter<?> wrapped;
 
-        public RxCallAdapterWrapper(Retrofit retrofit, CallAdapter<?> wrapped) {
+        RxCallAdapterWrapper(Retrofit retrofit, CallAdapter<?> wrapped) {
             this.retrofit = retrofit;
             this.wrapped = wrapped;
         }
@@ -57,32 +58,78 @@ public class RxErrorHandlingCallAdapterFactory extends CallAdapter.Factory {
             return wrapped.responseType();
         }
 
-        @SuppressWarnings("unchecked")
         @Override
-        public <R> Observable<?> adapt(Call<R> call) {
-            return ((Observable) wrapped.adapt(call)).onErrorResumeNext(new Func1<Throwable, Observable>() {
-                @Override
-                public Observable call(Throwable throwable) {
-                    return Observable.error(asRetrofitException(throwable));
-                }
-            });
+        public <R> Observable<Response<ApiResponse<?>>> adapt(Call<R> call) {
+            return ((Observable<Response<ApiResponse<?>>>) wrapped.adapt(call))
+                    .map(response -> {
+                        if (response.isSuccessful()) {
+                            int code = response.body().code;
+                            if (code >= 200 && code < 300 && TextUtils.equals("success", response.body().status)) {
+                                return response;
+                            }
+                            if (code == 401) {
+                                throw ApiError.unauthenticatedError(
+                                        response.raw().request().url().toString(),
+                                        response.body().error);
+                            }
+                            if (code >= 400 && code < 500) {
+                                throw ApiError.clientError(
+                                        response.raw().request().url().toString(),
+                                        code,
+                                        response.body().error);
+                            }
+                            if (code >= 500 && code < 600) {
+                                throw ApiError.serverError(
+                                        response.raw().request().url().toString(),
+                                        code,
+                                        response.body().error);
+                            }
+                            throw ApiError.unexpectedError(new RuntimeException("Unexpected response code = " + code + "; status = " + response.body().error));
+                        }
+                        int code = response.code();
+                        if (code == 401) {
+                            throw ApiError.unauthenticatedError(
+                                    response.raw().request().url().toString(),
+                                    "Unauthenticated");
+                        }
+                        if (code >= 400 && code < 500) {
+                            throw ApiError.clientError(
+                                    response.raw().request().url().toString(),
+                                    code,
+                                    "Client Error (" + code + ")");
+                        }
+                        if (code >= 500 && code < 600) {
+                            throw ApiError.serverError(
+                                    response.raw().request().url().toString(),
+                                    code,
+                                    "Server Error (" + code + ")");
+                        }
+                        throw ApiError.unexpectedError(new RuntimeException("Unexpected response code = " + code));
+                    })
+                    .onErrorResumeNext(throwable -> {
+                        throw asRetrofitException(throwable);
+                    });
         }
 
-        private RetrofitException asRetrofitException(Throwable throwable) {
-            // We had non-200 http error
-            if (throwable instanceof HttpException) {
-                HttpException httpException = (HttpException) throwable;
-                Response response = httpException.response();
-                return RetrofitException.httpError(response.raw().request().url().toString(), response, retrofit);
-            }
+        private ApiError asRetrofitException(Throwable throwable) {
+
+            if (throwable instanceof ApiError)
+                return (ApiError) throwable;
+
             // A network error happened
             if (throwable instanceof IOException) {
-                return RetrofitException.networkError((IOException) throwable);
+                return ApiError.networkError((IOException) throwable);
             }
+//            // We had non-200 http error
+//            if (throwable instanceof HttpException) {
+//                HttpException httpException = (HttpException) throwable;
+//                Response response = httpException.response();
+//                return RetrofitException.httpError(response.raw().request().url().toString(), response, retrofit);
+//            }
 
             // We don't know what happened. We need to simply convert to an unknown error
 
-            return RetrofitException.unexpectedError(throwable);
+            return ApiError.unexpectedError(throwable);
         }
     }
 }

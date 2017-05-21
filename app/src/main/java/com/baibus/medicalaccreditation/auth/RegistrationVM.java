@@ -1,5 +1,6 @@
 package com.baibus.medicalaccreditation.auth;
 
+import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.os.AsyncTask;
@@ -19,8 +20,8 @@ import com.baibus.medicalaccreditation.base.ActivityVM;
 import com.baibus.medicalaccreditation.base.FragmentVM;
 import com.baibus.medicalaccreditation.base.FragmentVMFactory;
 import com.baibus.medicalaccreditation.base.RxLoader;
-import com.baibus.medicalaccreditation.common.db.entities.User;
-import com.baibus.medicalaccreditation.common.network.RetrofitException;
+import com.baibus.medicalaccreditation.common.binding.ObservableString;
+import com.baibus.medicalaccreditation.common.network.ApiError;
 import com.baibus.medicalaccreditation.common.provider.ApiModule;
 
 import java.lang.annotation.Retention;
@@ -36,11 +37,6 @@ import static com.baibus.medicalaccreditation.auth.LoginVM.isNameValid;
 import static com.baibus.medicalaccreditation.auth.LoginVM.isPasswordConfirmValid;
 import static com.baibus.medicalaccreditation.auth.LoginVM.isPasswordValid;
 import static com.baibus.medicalaccreditation.base.ActivityVM.isMainLooper;
-import static com.baibus.medicalaccreditation.common.provider.ApiModule.HTTP_CODE_BAD_REQUEST;
-import static com.baibus.medicalaccreditation.common.provider.ApiModule.HTTP_CODE_FORBIDDEN;
-import static com.baibus.medicalaccreditation.common.provider.ApiModule.HTTP_CODE_NOT_FOUND;
-import static com.baibus.medicalaccreditation.common.provider.ApiModule.HTTP_CODE_PAYMENT_REQUIRED;
-import static com.baibus.medicalaccreditation.common.provider.ApiModule.HTTP_CODE_UNAUTHORIZED;
 
 
 public class RegistrationVM extends FragmentVM<RegistrationFragment>
@@ -55,20 +51,20 @@ public class RegistrationVM extends FragmentVM<RegistrationFragment>
     private final static String BUNDLE_PASSWORD_ERROR = "passwordError";
     private final static String BUNDLE_PASSWORD_CONFIRM = "passwordConfirm";
     private final static String BUNDLE_PASSWORD_CONFIRM_ERROR = "passwordConfirmError";
+    private final static String BUNDLE_FEMALE = "female";
     private final static String BUNDLE_STATUS = "mStatus";
 
     private final static int LOADER_REGISTRATION_USER = 0;
 
-    private final static int MESSAGE_NETWORK = -2;
-
-    public final ObservableField<String> email = new ObservableField<>();
-    public final ObservableField<String> emailError = new ObservableField<>();
-    public final ObservableField<String> name = new ObservableField<>();
-    public final ObservableField<String> nameError = new ObservableField<>();
-    public final ObservableField<String> password = new ObservableField<>();
-    public final ObservableField<String> passwordError = new ObservableField<>();
-    public final ObservableField<String> passwordConfirm = new ObservableField<>();
-    public final ObservableField<String> passwordConfirmError = new ObservableField<>();
+    public final ObservableString email = new ObservableString();
+    public final ObservableString emailError = new ObservableString();
+    public final ObservableString name = new ObservableString();
+    public final ObservableString nameError = new ObservableString();
+    public final ObservableString password = new ObservableString();
+    public final ObservableString passwordError = new ObservableString();
+    public final ObservableString passwordConfirm = new ObservableString();
+    public final ObservableString passwordConfirmError = new ObservableString();
+    public final ObservableBoolean female = new ObservableBoolean();
     private final ObservableInt mStatus = new ObservableInt();
     private final OnPropertyChangedCallback mStatusChanged = new OnPropertyChangedCallback() {
         @Override
@@ -90,12 +86,18 @@ public class RegistrationVM extends FragmentVM<RegistrationFragment>
         passwordError.set(savedInstanceState.getString(BUNDLE_PASSWORD_ERROR));
         passwordConfirm.set(savedInstanceState.getString(BUNDLE_PASSWORD_CONFIRM));
         passwordConfirmError.set(savedInstanceState.getString(BUNDLE_PASSWORD_CONFIRM_ERROR));
+        female.set(savedInstanceState.getBoolean(BUNDLE_FEMALE));
         mStatus.set(savedInstanceState.getInt(BUNDLE_STATUS));
 
         mStatus.addOnPropertyChangedCallback(mStatusChanged);
 
-        resumeLoaders(getStatusFromInt(mStatus.get()));
+    }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        resumeLoaders(getStatusFromInt(mStatus.get()));
     }
 
     @Override
@@ -109,6 +111,7 @@ public class RegistrationVM extends FragmentVM<RegistrationFragment>
         outState.putString(BUNDLE_PASSWORD_ERROR, passwordError.get());
         outState.putString(BUNDLE_PASSWORD_CONFIRM, passwordConfirm.get());
         outState.putString(BUNDLE_PASSWORD_CONFIRM_ERROR, passwordConfirmError.get());
+        outState.putBoolean(BUNDLE_FEMALE, female.get());
         outState.putInt(BUNDLE_STATUS, mStatus.get());
     }
 
@@ -161,11 +164,11 @@ public class RegistrationVM extends FragmentVM<RegistrationFragment>
 
         // Check for a valid name field.
         if (TextUtils.isEmpty(name)) {
-            this.emailError.set(fragment.getString(R.string.name_field_required));
+            this.nameError.set(fragment.getString(R.string.name_field_required));
             focusView = fragment.binding.textName;
             cancel = true;
         } else if (!isNameValid(name)) {
-            this.emailError.set(fragment.getString(R.string.error_invalid_name));
+            this.nameError.set(fragment.getString(R.string.error_invalid_name));
             focusView = fragment.binding.textName;
             cancel = true;
         }
@@ -188,14 +191,14 @@ public class RegistrationVM extends FragmentVM<RegistrationFragment>
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            loadRegistration(email, name, password, true);
+            loadRegistration(email, name, password, female.get(), true);
         }
     }
 
     private void resumeLoaders(@Status int status) {
         switch (status) {
             case REGISTRATION:
-                loadRegistration(email.get(), name.get(), password.get(), false);
+                loadRegistration(email.get(), name.get(), password.get(), female.get(), false);
                 break;
             case NOTHING:
                 break;
@@ -205,14 +208,14 @@ public class RegistrationVM extends FragmentVM<RegistrationFragment>
     private void restartLoaders(@Status int status) {
         switch (status) {
             case REGISTRATION:
-                loadRegistration(email.get(), name.get(), password.get(), true);
+                loadRegistration(email.get(), name.get(), password.get(), female.get(), true);
                 break;
             case NOTHING:
                 break;
         }
     }
 
-    private void success(User user) {
+    private void success(Boolean result) {
         mStatus.set(NOTHING);
         ActivityVM<?> activityVM = ((Activity) fragment.getActivity()).viewModel;
         activityVM.removeCurrentFragment();
@@ -221,75 +224,45 @@ public class RegistrationVM extends FragmentVM<RegistrationFragment>
     private void onError(Throwable throwable, @Status int from) {
         Log.d(TAG, "OUTER LOADER onError:" + isMainLooper());
         mStatus.set(NOTHING);
-        if (throwable instanceof RetrofitException) {
-            RetrofitException retrofitException = (RetrofitException) throwable;
-            switch (retrofitException.getKind()) {
+        if (throwable instanceof ApiError) {
+            ApiError apiError = (ApiError) throwable;
+            switch (apiError.getKind()) {
                 case NETWORK:
-                    retrofitException.getCause().printStackTrace();
-                    showError(MESSAGE_NETWORK, from);
+                    fragment.showSnackBar("Ошибка соединения", "повторить",
+                            view -> restartLoaders(from));
                     return;
-                case HTTP:
-                    showError(retrofitException.getResponse().code(), from);
+                case UNAUTHENTICATED:
+                case CLIENT:
+                case SERVER:
+                    fragment.showSnackBar(apiError.getMessage(), null, null);
                     return;
                 case UNEXPECTED:
-                    throw retrofitException;
+                    throw apiError;
             }
         }
         throw Exceptions.propagate(throwable);
     }
 
-    private void showError(int code, @Status int from) {
-        //TODO strings
-        switch (code) {
-            case MESSAGE_NETWORK:
-                fragment.showSnackBar("Инета нет",
-                        "повторить",
-                        view -> restartLoaders(from));
-                break;
-            case HTTP_CODE_BAD_REQUEST:
-            case HTTP_CODE_UNAUTHORIZED:
-            case HTTP_CODE_PAYMENT_REQUIRED:
-            case HTTP_CODE_FORBIDDEN:
-            case HTTP_CODE_NOT_FOUND:
-                fragment.showSnackBar("Что-то пошло не так",
-                        "повторить",
-                        view -> restartLoaders(from));
-                break;
-            default:
-                if (ApiModule.isServerError(code)) {
-                    fragment.showSnackBar("Ошибка сервера, попробуйте повторить позже",
-                            "повторить",
-                            view -> restartLoaders(from));
-                    return;
-                }
-                if (ApiModule.isClientError(code)) {
-                    fragment.showSnackBar("ошибка передачи данных",
-                            "повторить",
-                            view -> restartLoaders(from));
-                    return;
-                }
-                fragment.showSnackBar("Не обработанная ошибка", null, null);
-                break;
-        }
-    }
-
-    private void loadRegistration(String email, String name, String password, boolean restart) {
-        getObservableRegistration(email, name, password)
-                .subscribeOn(Schedulers.from(AsyncTask.THREAD_POOL_EXECUTOR))
-                .observeOn(AndroidSchedulers.from(fragment.mainHandler.getLooper()))
-                .compose(RxLoader.from(this, LOADER_REGISTRATION_USER, restart))
-                .doOnSubscribe(() -> mStatus.set(REGISTRATION))
-                .subscribe(this::success, throwable -> onError(throwable, REGISTRATION));
+    private void loadRegistration(String email, String name, String password, boolean female, boolean restart) {
+        fragment.addSubscription(
+                getObservableRegistration(email, name, password, female)
+                        .subscribeOn(Schedulers.from(AsyncTask.THREAD_POOL_EXECUTOR))
+                        .observeOn(AndroidSchedulers.from(fragment.mainHandler.getLooper()))
+                        .compose(RxLoader.from(this, LOADER_REGISTRATION_USER, restart))
+                        .doOnSubscribe(() -> mStatus.set(REGISTRATION))
+                        .subscribe(this::success, throwable -> onError(throwable, REGISTRATION))
+        );
     }
 
 
-    private static Observable<User> getObservableRegistration(String email, String name, String password) {
+    private static Observable<Boolean> getObservableRegistration(String email, String name, String password, boolean female) {
         return Observable
                 .defer(() -> {
                     Log.d(TAG, "INNER LOADER_REGISTRATION_USER" + isMainLooper());
                     return ApiModule
                             .getAuthApi()
-                            .registration(email, name, password);
+                            .registration(email, name, password, female ? "true" : "false", ApiModule.getDeviceKey())
+                            .map(registrationResponse -> true);
                 });
     }
 

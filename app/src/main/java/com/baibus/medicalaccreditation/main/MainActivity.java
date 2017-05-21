@@ -6,7 +6,6 @@ import android.os.Build;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.view.View;
 
 import com.baibus.medicalaccreditation.BR;
 import com.baibus.medicalaccreditation.R;
@@ -47,6 +46,12 @@ public class MainActivity extends Activity<MainActivity, ActivityMainBinding, Ma
     @Override
     protected MainActivity getThis() {
         return this;
+    }
+
+    @IdRes
+    @Override
+    public int getFragmentContainerId() {
+        return R.id.mainFrame;
     }
 
     @Override

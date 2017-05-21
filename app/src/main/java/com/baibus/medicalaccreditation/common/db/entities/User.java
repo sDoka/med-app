@@ -6,6 +6,8 @@ import android.text.TextUtils;
 import org.parceler.Parcel;
 import org.parceler.ParcelConstructor;
 
+import java.util.Date;
+
 /**
  * Created by Android Studio.
  * User: yanbaev.is
@@ -24,16 +26,25 @@ public class User {
     @NonNull
     private final String mEmail;
 
+    @NonNull
+    private final Date mLastSynchronization;
+
+    private final long mDeviceId;
+
     @ParcelConstructor
-    public User(long id, @NonNull String name, @NonNull String email) {
+    public User(long id, @NonNull String name, @NonNull String email,
+                @NonNull Date lastSynchronization, long deviceId) {
         this.mId = id;
         this.mName = name;
         this.mEmail = email;
+        this.mLastSynchronization = lastSynchronization;
+        this.mDeviceId = deviceId;
     }
 
     @NonNull
-    public static User newUser(long id, @NonNull String name, @NonNull String email) {
-        return new User(id, name, email);
+    public static User newInstance(long id, @NonNull String name, @NonNull String email,
+                                   @NonNull Date lastSynchronization, long deviceId) {
+        return new User(id, name, email, lastSynchronization, deviceId);
     }
 
     public long getId() {
@@ -50,6 +61,15 @@ public class User {
         return mEmail;
     }
 
+    @NonNull
+    public Date getLastSynchronization() {
+        return mLastSynchronization;
+    }
+
+    public long getDeviceId() {
+        return mDeviceId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -58,8 +78,10 @@ public class User {
         User that = (User) o;
 
         return mId == that.mId
+                && mDeviceId == that.mDeviceId
                 && TextUtils.equals(mName, that.mName)
-                && TextUtils.equals(mEmail, that.mEmail);
+                && TextUtils.equals(mEmail, that.mEmail)
+                && mLastSynchronization.equals(that.mLastSynchronization);
     }
 
     @Override
@@ -67,6 +89,8 @@ public class User {
         int result = (int) (mId ^ (mId >>> 32));
         result = 31 * result + mName.hashCode();
         result = 31 * result + mEmail.hashCode();
+        result = 31 * result + mLastSynchronization.hashCode();
+        result = 31 * result + (int) (mDeviceId ^ (mDeviceId >>> 32));
         return result;
     }
 
@@ -76,6 +100,8 @@ public class User {
                 "id=" + mId +
                 ", name='" + mName + '\'' +
                 ", email='" + mEmail + '\'' +
+                ", lastSynchronization=" + mLastSynchronization +
+                ", deviceId=" + mDeviceId +
                 '}';
     }
 }

@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View" alias="view"/>
         <variable name="viewModel" type="com.baibus.medicalaccreditation.auth.RegistrationVM"/>
     </data>
 
@@ -12,12 +13,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="com.baibus.medicalaccreditation.auth.AuthActivity"
-        tools:showIn="@layout/activity_auth">
+        tools:showIn="@layout/activity_auth"
+        android:background="@android:color/white">
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:fillViewport="true"
+            app:animatedVisibility="@{viewModel.isShowProgress ? view.GONE : view.VISIBLE}">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -28,59 +31,58 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                app:animatedVisibility="@{viewModel.isShowProgress ? view.GONE : view.VISIBLE}"
                 tools:visibility="visible">
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:hint="@string/prompt_email"
+                    app:error="@{viewModel.emailError}">
 
-                    <EditText
+                    <android.support.design.widget.TextInputEditText
                         android:id="@+id/text_email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/prompt_email"
                         android:inputType="textEmailAddress"
                         android:text="@={viewModel.email}"
                         android:maxLines="1"
-                        app:onEditorActionListener="@{viewModel}"
-                        app:errorText="@{viewModel.emailError}"
                         tools:text="email"/>
-
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <EditText
-                        android:id="@+id/text_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/prompt_name"
-                        android:inputType="textEmailAddress"
-                        android:text="@={viewModel.name}"
-                        android:maxLines="1"
-                        app:onEditorActionListener="@{viewModel}"
-                        app:errorText="@{viewModel.nameError}"
-                        tools:text="name"/>
+                    <!--app:onEditorActionListener="@{viewModel}"-->
 
                 </android.support.design.widget.TextInputLayout>
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp">
+                    android:hint="@string/prompt_name"
+                    app:error="@{viewModel.nameError}">
 
-                    <EditText
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/text_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapWords"
+                        android:text="@={viewModel.name}"
+                        android:maxLines="1"
+                        tools:text="name"/>
+                    <!--app:onEditorActionListener="@{viewModel}"-->
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:hint="@string/prompt_password"
+                    app:error="@{viewModel.passwordError}">
+
+                    <android.support.design.widget.TextInputEditText
                         android:id="@+id/edit_password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/prompt_password"
                         android:inputType="textPassword"
                         android:text="@={viewModel.password}"
                         android:maxLines="1"
-                        app:errorText="@{viewModel.passwordError}"
                         tools:text="password"/>
 
                 </android.support.design.widget.TextInputLayout>
@@ -88,23 +90,53 @@
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                    android:hint="@string/prompt_passwordConfirm"
+                    app:error="@{viewModel.passwordConfirmError}">
 
-                    <EditText
+                    <android.support.design.widget.TextInputEditText
                         android:id="@+id/edit_password_confirm"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/prompt_passwordConfirm"
                         android:imeActionId="@+id/login"
                         android:imeActionLabel="@string/action_registration_short"
                         android:imeOptions="actionUnspecified"
                         android:inputType="textPassword"
                         android:text="@={viewModel.passwordConfirm}"
                         android:maxLines="1"
-                        app:errorText="@{viewModel.passwordConfirmError}"
                         tools:text=""/>
 
                 </android.support.design.widget.TextInputLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:text="@string/male"/>
+
+                    <Switch
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:checked="@={viewModel.female}"
+                        tools:checked="true"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:text="@string/female"/>
+
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -121,7 +153,7 @@
                         android:text="@string/action_registration"
                         android:textStyle="bold"
                         android:minEms="6"
-                        app:onClick="@{() -> viewModel.attemptRegistration()}"/>
+                        android:onClick="@{(v) -> viewModel.attemptRegistration()}"/>
                 </LinearLayout>
 
             </LinearLayout>

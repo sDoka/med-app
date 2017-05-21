@@ -26,6 +26,6 @@ public class AttemptGetResolver extends DefaultGetResolver<Attempt> {
         long answerId = cursor.getLong(cursor.getColumnIndexOrThrow(AttemptTable.COLUMN_ANSWER_ID));
         long time = cursor.getLong(cursor.getColumnIndexOrThrow(AttemptTable.COLUMN_TIME));
 
-        return Attempt.newAttempt(id, questionId, answerId, time);
+        return Attempt.newInstance(id, questionId, answerId, time);
     }
 }

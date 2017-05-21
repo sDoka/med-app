@@ -24,6 +24,6 @@ public class SpecializationGetResolver extends DefaultGetResolver<Specialization
         String name = cursor.getString(cursor.getColumnIndexOrThrow(SpecializationTable.COLUMN_NAME));
         String filePath = cursor.getString(cursor.getColumnIndexOrThrow(SpecializationTable.COLUMN_FILE_PATH));
 
-        return Specialization.newSpecialization(id, name, filePath);
+        return Specialization.newInstance(id, name, filePath);
     }
 }

@@ -22,6 +22,8 @@ public class UserTable {
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_EMAIL = "email";
+    public static final String COLUMN_LAST_SYNCHRONIZATION = "last_synchronization";
+    public static final String COLUMN_DEVICE_ID = "device_id";
 
     @NonNull
     public static final Query QUERY = Query.builder()
@@ -40,7 +42,9 @@ public class UserTable {
         return "CREATE TABLE " + TABLE + "("
                 + COLUMN_ID + " INTEGER NOT NULL PRIMARY KEY, "
                 + COLUMN_NAME + " VARCHAR (100) NOT NULL, "
-                + COLUMN_EMAIL + " VARCHAR (200) NOT NULL"
+                + COLUMN_EMAIL + " VARCHAR (200) NOT NULL, "
+                + COLUMN_LAST_SYNCHRONIZATION + " INTEGER NOT NULL, "
+                + COLUMN_DEVICE_ID + " INTEGER NOT NULL"
                 + ");";
     }
 }

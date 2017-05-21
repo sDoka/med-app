@@ -31,7 +31,7 @@ public class AttemptPutResolver extends DefaultPutResolver<Attempt> {
     protected UpdateQuery mapToUpdateQuery(@NonNull Attempt object) {
         return UpdateQuery.builder()
                 .table(AttemptTable.TABLE)
-                .where("id = ?")
+                .where(AttemptTable.COLUMN_ID + " = ?")
                 .whereArgs(object.getId())
                 .build();
     }

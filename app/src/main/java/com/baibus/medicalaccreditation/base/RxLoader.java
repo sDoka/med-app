@@ -21,8 +21,21 @@ import rx.functions.Action1;
 public class RxLoader {
     private static final String TAG = RxLoader.class.getSimpleName();
 
+    /** This must be called IN or AFTER {@link FragmentVM#onActivityCreated(Bundle)}
+     * @see <a href="https://issuetracker.google.com/issues/37139856">LoaderManager doStart called twice in Fragment.onStart</a>
+     * and after release new builds sdk check this*/
     public static <T> Observable.Transformer<T, T> from(FragmentVM viewModel, int id, boolean forceReload) {
-        return from(viewModel.fragment.getContext(), viewModel.fragment.getLoaderManager(), id, forceReload);
+        if (viewModel.isActivityCreated()) {
+            return from(viewModel.fragment.getContext(), viewModel.fragment.getLoaderManager(), id, forceReload);
+        }
+        throw new RuntimeException("Loader must be called IN or AFTER FragmentVM.onActivityCreated()");
+    }
+
+    public static <T> Observable.Transformer<T, T> from(DialogFragmentVM viewModel, int id, boolean forceReload) {
+        if (viewModel.isActivityCreated()) {
+            return from(viewModel.fragment.getContext(), viewModel.fragment.getLoaderManager(), id, forceReload);
+        }
+        throw new RuntimeException("Loader must be called IN or AFTER DialogFragmentVM.onActivityCreated()");
     }
 
     public static <T> Observable.Transformer<T, T> from(ActivityVM viewModel, int id, boolean forceReload) {

@@ -40,7 +40,7 @@ public class Question {
     }
 
     @NonNull
-    public static Question newQuestion(long id, long index, long specializationId,
+    public static Question newInstance(long id, long index, long specializationId,
                                        @NonNull String text, @Nullable String filePath) {
         return new Question(id, index, specializationId, text, filePath);
     }

@@ -32,7 +32,7 @@ public class Attempt {
     }
 
     @NonNull
-    public static Attempt newAttempt(long id, long questionId, long answerId, long time) {
+    public static Attempt newInstance(long id, long questionId, long answerId, long time) {
         return new Attempt(id, questionId, answerId, time);
     }
 

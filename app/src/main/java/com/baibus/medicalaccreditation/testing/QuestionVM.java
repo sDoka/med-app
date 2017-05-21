@@ -16,10 +16,10 @@ import org.parceler.ParcelProperty;
 import org.parceler.Transient;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
-import me.tatarka.bindingcollectionadapter2.BindingListViewAdapter;
-import me.tatarka.bindingcollectionadapter2.OnItemBind;
+import me.tatarka.bindingcollectionadapter2.ItemBinding;
 
 /**
  * Created by Android Studio.
@@ -28,22 +28,18 @@ import me.tatarka.bindingcollectionadapter2.OnItemBind;
  * Time: 8:52
  * To change this template use File | settings | File Templates.
  */
-@Parcel
+@Parcel(Parcel.Serialization.BEAN)
 public class QuestionVM extends BaseObservable implements OnAnswerAttemptedListener {
     @Transient
     private WeakReference<OnQuestionAttemptedListener> mListener = new WeakReference<>(null);
     public final ObservableInt position = new ObservableInt();
     public final ObservableField<Question> question = new ObservableField<>();
-    @ParcelProperty("answers")
     public final ObservableArrayList<Answer> answers = new ObservableArrayList<>();
     @Transient
-    public final OnItemBind<Answer> itemBinding =
-            (itemBinding, position, item) -> itemBinding
-                    .set(BR.itemViewModel, R.layout.item_answer)
-                    .bindExtra(BR.listener, (OnAnswerAttemptedListener) this)
-                    .bindExtra(BR.position, position);
-    @Transient
-    public final BindingListViewAdapter.ItemIds<Answer> itemIds = (position1, item) -> item.getId();
+    public final ItemBinding<Answer> itemBinding = ItemBinding
+            .<Answer>of(BR.itemViewModel, R.layout.item_answer)
+            .bindExtra(BR.listener, QuestionVM.this)
+            .bindExtra(BR.position, position);
 
     @ParcelConstructor
     QuestionVM(@ParcelProperty("position") int position,
@@ -75,5 +71,9 @@ public class QuestionVM extends BaseObservable implements OnAnswerAttemptedListe
     @ParcelProperty("question")
     Question getParcelQuestion() {
         return question.get();
+    }
+    @ParcelProperty("answers")
+    List<Answer> getParcelAnswers() {
+        return new ArrayList<>(answers);
     }
 }

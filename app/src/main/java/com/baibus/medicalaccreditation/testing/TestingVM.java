@@ -107,18 +107,20 @@ public class TestingVM extends FragmentVM<TestingFragment> implements OnQuestion
     }
 
     private void loadQuestions(boolean restart) {
-        getObservableQuestions(specialization.get())
-                .subscribeOn(Schedulers.from(AsyncTask.THREAD_POOL_EXECUTOR))
-                .observeOn(AndroidSchedulers.from(fragment.mainHandler.getLooper()))
-                .compose(RxLoader.from(this, LOADER_GET_QUESTIONS, restart))
-                .doOnSubscribe(() -> isShowProgress.set(true))
-                .subscribe(value -> {
-                    isShowProgress.set(false);
-                    setItems(value);
-                }, throwable -> {
-                    isShowProgress.set(false);
-                    throw Exceptions.propagate(throwable);
-                });
+        fragment.addSubscription(
+                getObservableQuestions(specialization.get())
+                        .subscribeOn(Schedulers.from(AsyncTask.THREAD_POOL_EXECUTOR))
+                        .observeOn(AndroidSchedulers.from(fragment.mainHandler.getLooper()))
+                        .compose(RxLoader.from(this, LOADER_GET_QUESTIONS, restart))
+                        .doOnSubscribe(() -> isShowProgress.set(true))
+                        .subscribe(value -> {
+                            isShowProgress.set(false);
+                            setItems(value);
+                        }, throwable -> {
+                            isShowProgress.set(false);
+                            throw Exceptions.propagate(throwable);
+                        })
+        );
     }
 
     private static Observable<List<QuestionVM>> getObservableQuestions(Specialization specialization) {
@@ -130,7 +132,7 @@ public class TestingVM extends FragmentVM<TestingFragment> implements OnQuestion
                             return Observable.error(new IllegalArgumentException("Specialization must not null"));
                         } else {
                             return ApiModule
-                                    .getStoreIOSQLite(MedApplication.getInstance())
+                                    .getStoreIOSQLite()
                                     .get()
                                     .listOfObjects(Question.class)
                                     .withQuery(QuestionTable.querySpecializationId(specialization.getId()))
@@ -146,7 +148,7 @@ public class TestingVM extends FragmentVM<TestingFragment> implements OnQuestion
                     for (int i = 0, questionsSize = questions.size(); i < questionsSize; i++) {
                         Question question = questions.get(i);
                         List<Answer> answers = ApiModule
-                                .getStoreIOSQLite(MedApplication.getInstance())
+                                .getStoreIOSQLite()
                                 .get()
                                 .listOfObjects(Answer.class)
                                 .withQuery(AnswerTable.queryQuestionId(specialization.getId()))

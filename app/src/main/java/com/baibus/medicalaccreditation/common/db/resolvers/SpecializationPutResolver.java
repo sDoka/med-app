@@ -31,7 +31,7 @@ public class SpecializationPutResolver extends DefaultPutResolver<Specialization
     protected UpdateQuery mapToUpdateQuery(@NonNull Specialization object) {
         return UpdateQuery.builder()
                 .table(SpecializationTable.TABLE)
-                .where("id = ?")
+                .where(SpecializationTable.COLUMN_ID + " = ?")
                 .whereArgs(object.getId())
                 .build();
     }

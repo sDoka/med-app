@@ -1,6 +1,5 @@
 package com.baibus.medicalaccreditation.auth;
 
-import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,16 +13,18 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
-import com.baibus.medicalaccreditation.MedApplication;
 import com.baibus.medicalaccreditation.R;
 import com.baibus.medicalaccreditation.base.Activity;
 import com.baibus.medicalaccreditation.base.ActivityVM;
 import com.baibus.medicalaccreditation.base.FragmentVM;
 import com.baibus.medicalaccreditation.base.FragmentVMFactory;
 import com.baibus.medicalaccreditation.base.RxLoader;
-import com.baibus.medicalaccreditation.common.db.entities.User;
-import com.baibus.medicalaccreditation.common.network.RetrofitException;
+import com.baibus.medicalaccreditation.common.binding.ObservableString;
+import com.baibus.medicalaccreditation.common.db.tables.AccountTable;
+import com.baibus.medicalaccreditation.common.network.ApiError;
+import com.baibus.medicalaccreditation.common.network.entities.RegistrationResponse;
 import com.baibus.medicalaccreditation.common.provider.ApiModule;
+import com.baibus.medicalaccreditation.update.UpdateActivity;
 import com.pushtorefresh.storio.StorIOException;
 import com.pushtorefresh.storio.sqlite.operations.put.PutResult;
 
@@ -38,11 +39,6 @@ import rx.schedulers.Schedulers;
 
 import static com.baibus.medicalaccreditation.base.ActivityVM.isMainLooper;
 import static com.baibus.medicalaccreditation.common.db.tables.UserTable.DELETE_ALL;
-import static com.baibus.medicalaccreditation.common.provider.ApiModule.HTTP_CODE_BAD_REQUEST;
-import static com.baibus.medicalaccreditation.common.provider.ApiModule.HTTP_CODE_UNAUTHORIZED;
-import static com.baibus.medicalaccreditation.common.provider.ApiModule.HTTP_CODE_PAYMENT_REQUIRED;
-import static com.baibus.medicalaccreditation.common.provider.ApiModule.HTTP_CODE_FORBIDDEN;
-import static com.baibus.medicalaccreditation.common.provider.ApiModule.HTTP_CODE_NOT_FOUND;
 
 public class LoginVM extends FragmentVM<LoginFragment>
     implements TextView.OnEditorActionListener {
@@ -57,13 +53,10 @@ public class LoginVM extends FragmentVM<LoginFragment>
     private final static int LOADER_AUTHENTICATE_USER = 0;
     private final static int LOADER_CHECK_USER = 1;
 
-    private final static int MESSAGE_SAVE_USER = -1;
-    private final static int MESSAGE_NETWORK = -2;
-
-    public final ObservableField<String> email = new ObservableField<>();
-    public final ObservableField<String> emailError = new ObservableField<>();
-    public final ObservableField<String> password = new ObservableField<>();
-    public final ObservableField<String> passwordError = new ObservableField<>();
+    public final ObservableString email = new ObservableString();
+    public final ObservableString emailError = new ObservableString();
+    public final ObservableString password = new ObservableString();
+    public final ObservableString passwordError = new ObservableString();
     private final ObservableInt mStatus = new ObservableInt();
     private final OnPropertyChangedCallback mStatusChanged = new OnPropertyChangedCallback() {
         @Override
@@ -85,6 +78,11 @@ public class LoginVM extends FragmentVM<LoginFragment>
         mStatus.set(savedInstanceState.getInt(BUNDLE_STATUS));
 
         mStatus.addOnPropertyChangedCallback(mStatusChanged);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
         resumeLoaders(getStatusFromInt(mStatus.get()));
     }
@@ -192,94 +190,63 @@ public class LoginVM extends FragmentVM<LoginFragment>
     }
 
     void showMessageSuccessRegistration() {
-        //TODO show message
+        fragment.showSnackBar("Вы успешно зарегистрированы", null, null);
     }
 
-    private void authSuccess(User user) {
+    private void authSuccess(Boolean result) {
         mStatus.set(NOTHING);
-        //TODO update bd
+        fragment.getActivity().startActivity(UpdateActivity.getStartIntent());
+        fragment.getActivity().finish();
     }
 
     private void onError(Throwable throwable, @Status int from) {
         Log.d(TAG, "OUTER LOADER onError:" + isMainLooper());
         mStatus.set(NOTHING);
-        if (throwable instanceof RetrofitException) {
-            RetrofitException retrofitException = (RetrofitException) throwable;
-            switch (retrofitException.getKind()) {
+        if (throwable instanceof ApiError) {
+            ApiError apiError = (ApiError) throwable;
+            switch (apiError.getKind()) {
                 case NETWORK:
-                    retrofitException.getCause().printStackTrace();
-                    showError(MESSAGE_NETWORK, from);
+                    fragment.showSnackBar("Ошибка соединения", "повторить",
+                            view -> restartLoaders(from));
                     return;
-                case HTTP:
-                    showError(retrofitException.getResponse().code(), from);
+                case UNAUTHENTICATED:
+                case CLIENT:
+                case SERVER:
+                    fragment.showSnackBar(apiError.getMessage(), null, null);
                     return;
                 case UNEXPECTED:
-                    throw retrofitException;
+                    throw apiError;
             }
         }
         if (TextUtils.equals(throwable.getMessage(), "User not been saved")) {
-            showError(MESSAGE_SAVE_USER, from);
+            fragment.showSnackBar(throwable.getMessage(), "повторить",
+                    view -> restartLoaders(from));
             return;
         }
         throw Exceptions.propagate(throwable);
     }
 
-    private void showError(int code, @Status int from) {
-        //TODO strings
-        switch (code) {
-            case MESSAGE_NETWORK:
-                fragment.showSnackBar("Инета нет",
-                        "повторить",
-                        view -> restartLoaders(from));
-                break;
-            case MESSAGE_SAVE_USER:
-                fragment.showSnackBar("Не удалось сохранить",
-                        "повторить",
-                        view -> restartLoaders(from));
-                break;
-            case HTTP_CODE_BAD_REQUEST:
-            case HTTP_CODE_UNAUTHORIZED:
-            case HTTP_CODE_PAYMENT_REQUIRED:
-            case HTTP_CODE_FORBIDDEN:
-            case HTTP_CODE_NOT_FOUND:
-                fragment.showSnackBar("Что-то пошло не так",
-                        "повторить",
-                        view -> restartLoaders(from));
-                break;
-            default:
-                if (ApiModule.isServerError(code)) {
-                    fragment.showSnackBar("Ошибка сервера, попробуйте повторить позже",
-                            "повторить",
-                            view -> restartLoaders(from));
-                    return;
-                }
-                if (ApiModule.isClientError(code)) {
-                    fragment.showSnackBar("ошибка передачи данных",
-                            "повторить",
-                            view -> restartLoaders(from));
-                    return;
-                }
-                fragment.showSnackBar("Не обработанная ошибка", null, null);
-                break;
-        }
-    }
-
     private void loadCheck(boolean restart) {
-        getObservableCheck()
-                .subscribeOn(Schedulers.from(AsyncTask.THREAD_POOL_EXECUTOR))
-                .observeOn(AndroidSchedulers.from(fragment.mainHandler.getLooper()))
-                .compose(RxLoader.from(this, LOADER_CHECK_USER, restart))
-                .doOnSubscribe(() -> mStatus.set(CHECK))
-                .subscribe(this::authSuccess, throwable -> onError(throwable, CHECK));
+        mStatus.set(NOTHING);
+//        fragment.addSubscription(
+//                getObservableCheck()
+//                        .subscribeOn(Schedulers.from(AsyncTask.THREAD_POOL_EXECUTOR))
+//                        .observeOn(AndroidSchedulers.from(fragment.mainHandler.getLooper()))
+//                        .compose(RxLoader.from(this, LOADER_CHECK_USER, restart))
+//                        .doOnSubscribe(() -> mStatus.set(CHECK))
+//                        .subscribe(this::authSuccess, throwable -> onError(throwable, CHECK))
+//        );
     }
 
     private void loadLogin(String email, String password, boolean restart) {
-        getObservableUserLogin(email, password)
-                .subscribeOn(Schedulers.from(AsyncTask.THREAD_POOL_EXECUTOR))
-                .observeOn(AndroidSchedulers.from(fragment.mainHandler.getLooper()))
-                .compose(RxLoader.from(this, LOADER_AUTHENTICATE_USER, restart))
-                .doOnSubscribe(() -> mStatus.set(LOGIN))
-                .subscribe(this::authSuccess, throwable -> onError(throwable, LOGIN));
+        fragment.addSubscription(
+                getObservableUserLogin(email, password)
+                        .subscribeOn(Schedulers.from(AsyncTask.THREAD_POOL_EXECUTOR))
+                        .observeOn(AndroidSchedulers.from(fragment.mainHandler.getLooper()))
+                        .compose(RxLoader.from(this, LOADER_AUTHENTICATE_USER, restart))
+                        .doOnSubscribe(() -> mStatus.set(LOGIN))
+                        .subscribe(this::authSuccess, throwable -> onError(throwable, LOGIN))
+        );
     }
 
     /**
@@ -288,28 +255,26 @@ public class LoginVM extends FragmentVM<LoginFragment>
      * errors are presented and no actual login attempt is made.
      */
     static boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        //•	E-mail адрес (строка по паттерну);
-        return email.contains("@");
+        String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+        return email.matches(emailPattern);
     }
 
+
     static boolean isNameValid(String name) {
-        //TODO: Replace this with your own logic
-        //•	Имя (только латинские или русские буквы 4-8 символов);
-        return name.length() > 3;
+        return name.length() > 3
+                && name.matches(".*[a-zA-Z].*");
     }
 
     static boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        //•	Пароль (4 – 16 символов русского или латинского алфавита, минимум одна цифра);
-        return password.length() > 3;
+        return password.length() > 3
+                && password.matches(".*[a-zA-Z].*");
     }
 
     static boolean isPasswordConfirmValid(String password, String passwordConfirm) {
         return TextUtils.equals(password, passwordConfirm);
     }
 
-    private static Observable<User> getObservableCheck() {
+    private static Observable<Boolean> getObservableCheck() {
         return Observable
                 .defer(() -> {
                     Log.d(TAG, "INNER LOADER_CHECK_USER" + isMainLooper());
@@ -317,36 +282,49 @@ public class LoginVM extends FragmentVM<LoginFragment>
                             .getAuthApi()
                             .check();
                 })
-                .map(new SaveUser());
+                .map(new Save());
     }
 
-    private static Observable<User> getObservableUserLogin(String email, String password) {
+    private static Observable<Boolean> getObservableUserLogin(String email, String password) {
         return Observable
                 .defer(() -> {
                     Log.d(TAG, "INNER LOADER_AUTHENTICATE_USER" + isMainLooper());
                     return ApiModule
                             .getAuthApi()
-                            .login(email, password);
+                            .login(email, password, ApiModule.getDeviceKey());
                 })
-                .map(new SaveUser());
+                .map(new Save());
     }
 
-    private static class SaveUser implements Func1<User, User>  {
+    private static class Save implements Func1<RegistrationResponse, Boolean>  {
         @Override
-        public User call(User user) {
+        public Boolean call(RegistrationResponse registrationResponse) {
             ApiModule
-                    .getStoreIOSQLite(MedApplication.getInstance())
+                    .getStoreIOSQLite()
                     .delete()
                     .byQuery(DELETE_ALL)
                     .prepare()
                     .executeAsBlocking();
+
             PutResult result = ApiModule
-                    .getStoreIOSQLite(MedApplication.getInstance())
+                    .getStoreIOSQLite()
                     .put()
-                    .object(user)
+                    .object(registrationResponse.getUser())
                     .prepare()
                     .executeAsBlocking();
-            if (result.wasInserted()) return user;
+            ApiModule
+                    .getStoreIOSQLite()
+                    .delete()
+                    .byQuery(AccountTable.deleteQuery(registrationResponse.getAccount()))
+                    .prepare()
+                    .executeAsBlocking();
+            ApiModule
+                    .getStoreIOSQLite()
+                    .put()
+                    .object(registrationResponse.getAccount())
+                    .prepare()
+                    .executeAsBlocking();
+            if (result.wasInserted()) return true;
             throw new StorIOException("User not been saved");
         }
     }

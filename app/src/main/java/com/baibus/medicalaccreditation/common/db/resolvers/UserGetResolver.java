@@ -7,6 +7,8 @@ import com.baibus.medicalaccreditation.common.db.entities.User;
 import com.baibus.medicalaccreditation.common.db.tables.UserTable;
 import com.pushtorefresh.storio.sqlite.operations.get.DefaultGetResolver;
 
+import java.util.Date;
+
 /**
  * Created by Android Studio.
  * User: yanbaev.is
@@ -23,7 +25,10 @@ public class UserGetResolver extends DefaultGetResolver<User> {
         long id = cursor.getLong(cursor.getColumnIndexOrThrow(UserTable.COLUMN_ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_NAME));
         String email = cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_EMAIL));
+        Date lastSynchronization = new Date(cursor.getLong(
+                cursor.getColumnIndexOrThrow(UserTable.COLUMN_LAST_SYNCHRONIZATION)));
+        long deviceId = cursor.getLong(cursor.getColumnIndexOrThrow(UserTable.COLUMN_DEVICE_ID));
 
-        return User.newUser(id, name, email);
+        return User.newInstance(id, name, email, lastSynchronization, deviceId);
     }
 }

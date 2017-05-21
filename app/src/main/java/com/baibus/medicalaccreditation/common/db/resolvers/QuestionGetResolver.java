@@ -27,6 +27,6 @@ public class QuestionGetResolver extends DefaultGetResolver<Question> {
         int column = cursor.getColumnIndexOrThrow(QuestionTable.COLUMN_FILE_PATH);
         String filePath = cursor.isNull(column) ? null : cursor.getString(column);
 
-        return Question.newQuestion(id, index, specializationId, text, filePath);
+        return Question.newInstance(id, index, specializationId, text, filePath);
     }
 }

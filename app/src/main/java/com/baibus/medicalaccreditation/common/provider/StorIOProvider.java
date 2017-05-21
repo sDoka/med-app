@@ -41,6 +41,7 @@ class StorIOProvider {
         }
         if (changes.affectedTables().contains(SpecializationTable.TABLE)) {
             MedApplication.getInstance().reloadSpecialization();
+            MedApplication.getInstance().reloadSpecializations();
         }
     };
 
@@ -76,6 +77,11 @@ class StorIOProvider {
                                     .putResolver(new UserPutResolver())
                                     .getResolver(new UserGetResolver())
                                     .deleteResolver(new UserDeleteResolver())
+                                    .build())
+                            .addTypeMapping(Account.class, SQLiteTypeMapping.<Account>builder()
+                                    .putResolver(new AccountPutResolver())
+                                    .getResolver(new AccountGetResolver())
+                                    .deleteResolver(new AccountDeleteResolver())
                                     .build())
                             .addTypeMapping(Attempt.class, SQLiteTypeMapping.<Attempt>builder()
                                     .putResolver(new AttemptPutResolver())

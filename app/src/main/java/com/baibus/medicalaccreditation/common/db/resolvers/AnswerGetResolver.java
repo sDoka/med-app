@@ -27,6 +27,6 @@ public class AnswerGetResolver extends DefaultGetResolver<Answer> {
         String filePath = cursor.isNull(column) ? null : cursor.getString(column);
         int isCorrect = cursor.getInt(cursor.getColumnIndexOrThrow(AnswerTable.COLUMN_IS_CORRECT));
 
-        return Answer.newAnswer(id, questionId, text, filePath, isCorrect == 1);
+        return Answer.newInstance(id, questionId, text, filePath, isCorrect == 1);
     }
 }

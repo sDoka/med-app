@@ -1,13 +1,24 @@
 package com.baibus.medicalaccreditation.common.provider;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.telephony.TelephonyManager;
 
-import com.baibus.medicalaccreditation.common.network.AuthApi;
-import com.baibus.medicalaccreditation.common.network.RestApi;
-import com.google.gson.Gson;
+import com.baibus.medicalaccreditation.MedApplication;
+import com.baibus.medicalaccreditation.common.network.AuthApiImpl;
+import com.baibus.medicalaccreditation.common.network.RestApiImpl;
+import com.baibus.medicalaccreditation.common.network.retrofit.AuthApi;
+import com.baibus.medicalaccreditation.common.network.retrofit.RestApi;
 import com.pushtorefresh.storio.sqlite.StorIOSQLite;
 
-import okhttp3.OkHttpClient;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 
 /**
  * Created by Android Studio.
@@ -21,37 +32,80 @@ public class ApiModule {
         throw new AssertionError();
     }
 
+    private static Map<String, Object> INSTANCES = new HashMap<>();
+    private static final Object SYNC = new Object();
+
     public final static String EXTRA_PROGRESS_READ = "EXTRA_PROGRESS_READ";
     public final static String EXTRA_PROGRESS_LENGTH = "EXTRA_PROGRESS_LENGTH";
 
-    public final static int HTTP_CODE_BAD_REQUEST = 400;
-    public final static int HTTP_CODE_UNAUTHORIZED = 401;
-    public final static int HTTP_CODE_PAYMENT_REQUIRED = 402;
-    public final static int HTTP_CODE_FORBIDDEN = 403;
-    public final static int HTTP_CODE_NOT_FOUND = 404;
-
-    public static boolean isClientError(int code) {
-        return isBetween(code, 400, 499);
-    }
-    public static boolean isServerError(int code) {
-        return isBetween(code, 500, 599);
+    @SuppressLint("HardwareIds")
+    public static String getDeviceKey() {
+        return ((TelephonyManager) MedApplication.getInstance().getSystemService(Context.TELEPHONY_SERVICE))
+                .getDeviceId();
     }
 
-    public static RestApi getRestApi() {
-        OkHttpClient client = OkHttpProvider.getOkHttpClient();
-        return RetrofitProvider.getInstance(RestApi.gson, client).getRestApi(RestApi.class);
+    public static RestApiImpl getRestApi() {
+        RestApiImpl api = findApiInstance(RestApiImpl.class);
+        if (api == null) {
+            api = new RestApiImpl(RetrofitProvider
+                    .provide(OkHttpProvider.getOkHttpClient())
+                    .create(RestApi.class)
+            );
+            addApiInstance(RestApiImpl.class, api);
+        }
+        return api;
     }
 
-    public static AuthApi getAuthApi() {
-        OkHttpClient client = OkHttpProvider.getOkHttpClient();
-        return RetrofitProvider.getInstance(AuthApi.gson, client).getRestApi(AuthApi.class);
+    public static RestApiImpl getRestApiMock(String body) {
+        return new RestApiImpl(RetrofitProvider
+                .provide(OkHttpProvider.getOkHttpClient(), body)
+                .create(RestApi.class)
+        );
     }
 
-    public static StorIOSQLite getStoreIOSQLite(Context context) {
-        return StorIOProvider.getStorIO(context);
+    public static void shutdownServer() {
+        try {
+            if (RetrofitProvider.server == null) {
+                return;
+            }
+            RetrofitProvider.server.shutdown();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
-    private static boolean isBetween(int x, int lower, int upper) {
-        return lower <= x && x <= upper;
+    @NonNull
+    public static AuthApiImpl getAuthApi() {
+        AuthApiImpl api = findApiInstance(AuthApiImpl.class);
+        if (api == null) {
+            api = new AuthApiImpl(RetrofitProvider
+                    .provide(OkHttpProvider.getOkHttpClient())
+                    .create(AuthApi.class)
+            );
+            addApiInstance(AuthApiImpl.class, api);
+        }
+        return api;
+    }
+
+    public static StorIOSQLite getStoreIOSQLite() {
+        return StorIOProvider.getStorIO(MedApplication.getInstance());
+    }
+
+    private static <T> void addApiInstance(@NonNull Class<T> clazz, T client) {
+        synchronized (SYNC) {
+            INSTANCES.put(clazz.getCanonicalName(), client);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    private static <T> T findApiInstance(@NonNull Class<T> clazz) {
+        synchronized (SYNC) {
+            Object object = INSTANCES.get(clazz.getCanonicalName());
+            if (clazz.isInstance(object)) {
+                return (T) object;
+            }
+            return null;
+        }
     }
 }

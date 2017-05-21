@@ -27,7 +27,6 @@ public abstract class ActivityVM<A extends Activity> extends BaseObservable {
 
     private final static String BUNDLE_IS_SHOW_PROGRESS = "isShowProgress";
 
-
     protected A activity;
 
     public ObservableField<CharSequence> title = new ObservableField<>();
@@ -100,7 +99,9 @@ public abstract class ActivityVM<A extends Activity> extends BaseObservable {
 
     protected boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            activity.finish();
+            if (!activity.getSupportFragmentManager().popBackStackImmediate()) {
+                activity.finish();
+            }
             return true;
         }
         return false;

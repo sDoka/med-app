@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View" alias="view"/>
         <variable name="viewModel" type="com.baibus.medicalaccreditation.testing.TestingVM"/>
     </data>
 

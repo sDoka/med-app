@@ -23,7 +23,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            fresco:progressBarImage="@{progress.newInstance(0x800080FF)}"
+            bind:progressBarImage="@{progress.newInstance(0x800080FF)}"
             fresco:placeholderImage="@drawable/side_nav_bar"
             fresco:roundAsCircle="false"
             bind:imageURI='@{viewModel.specialization.filePath}'/>
@@ -38,8 +38,9 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/textUser"
             app:layout_constraintRight_toRightOf="parent"
-            android:text='@{viewModel.specialization.name}'
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:text='@{viewModel.specialization.name}'
+            android:onClick="@{(v) -> viewModel.changeSpecialization()}"
             tools:text="Специализация"/>
 
         <TextView
