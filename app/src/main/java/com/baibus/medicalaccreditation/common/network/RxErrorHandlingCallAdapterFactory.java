@@ -107,11 +107,11 @@ public class RxErrorHandlingCallAdapterFactory extends CallAdapter.Factory {
                         throw ApiError.unexpectedError(new RuntimeException("Unexpected response code = " + code));
                     })
                     .onErrorResumeNext(throwable -> {
-                        throw asRetrofitException(throwable);
+                        throw asApiError(throwable);
                     });
         }
 
-        private ApiError asRetrofitException(Throwable throwable) {
+        private ApiError asApiError(Throwable throwable) {
 
             if (throwable instanceof ApiError)
                 return (ApiError) throwable;

@@ -1,7 +1,6 @@
 package com.baibus.medicalaccreditation.auth;
 
 import android.databinding.ObservableBoolean;
-import android.databinding.ObservableField;
 import android.databinding.ObservableInt;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -217,8 +216,10 @@ public class RegistrationVM extends FragmentVM<RegistrationFragment>
 
     private void success(Boolean result) {
         mStatus.set(NOTHING);
-        ActivityVM<?> activityVM = ((Activity) fragment.getActivity()).viewModel;
-        activityVM.removeCurrentFragment();
+        fragment.mainHandler.post(() -> {
+            ActivityVM<?> activityVM = ((Activity) fragment.getActivity()).viewModel;
+            activityVM.removeCurrentFragment();
+        });
     }
 
     private void onError(Throwable throwable, @Status int from) {

@@ -9,6 +9,7 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 import rx.Observable;
 
 /**
@@ -22,11 +23,10 @@ public interface AuthApi {
 
     String AUTH_URL = "user-managment/";
 
-    @FormUrlEncoded
-    @POST(AUTH_URL + "get-user")
-    Observable<Response<ApiResponse<RegistrationResponse>>> login(@Field("email") String email,
-                                                                  @Field("password") String password,
-                                                                  @Field("deviceKey") String deviceKey);
+    @GET(AUTH_URL + "get-user")
+    Observable<Response<ApiResponse<RegistrationResponse>>> login(@Query("email") String email,
+                                                                  @Query("password") String password,
+                                                                  @Query("deviceKey") String deviceKey);
 
     @FormUrlEncoded
     @POST(AUTH_URL + "add-user")
