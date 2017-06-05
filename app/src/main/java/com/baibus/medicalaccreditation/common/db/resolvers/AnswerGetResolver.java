@@ -24,9 +24,10 @@ public class AnswerGetResolver extends DefaultGetResolver<Answer> {
         long questionId = cursor.getLong(cursor.getColumnIndexOrThrow(AnswerTable.COLUMN_QUESTION_ID));
         String text = cursor.getString(cursor.getColumnIndexOrThrow(AnswerTable.COLUMN_TEXT));
         int column = cursor.getColumnIndexOrThrow(AnswerTable.COLUMN_FILE_PATH);
+        int type = cursor.getColumnIndexOrThrow(AnswerTable.COLUMN_TYPE);
         String filePath = cursor.isNull(column) ? null : cursor.getString(column);
         int isCorrect = cursor.getInt(cursor.getColumnIndexOrThrow(AnswerTable.COLUMN_IS_CORRECT));
 
-        return Answer.newInstance(id, questionId, text, filePath, isCorrect == 1);
+        return Answer.newInstance(id, questionId, text, type, filePath, isCorrect == 1);
     }
 }

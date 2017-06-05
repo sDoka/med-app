@@ -22,7 +22,9 @@ public class AccountGetResolver extends DefaultGetResolver<Account> {
 
         long user_id = cursor.getLong(cursor.getColumnIndexOrThrow(AccountTable.COLUMN_USER_ID));
         long type = cursor.getLong(cursor.getColumnIndexOrThrow(AccountTable.COLUMN_TYPE));
+        long activationDate = cursor.getLong(cursor.getColumnIndexOrThrow(AccountTable.COLUMN_ACTIVATION));
+        long expirationDate = cursor.getLong(cursor.getColumnIndexOrThrow(AccountTable.COLUMN_EXPIRATION));
 
-        return Account.newInstance(user_id, type);
+        return Account.newInstance(user_id, type, activationDate, expirationDate);
     }
 }

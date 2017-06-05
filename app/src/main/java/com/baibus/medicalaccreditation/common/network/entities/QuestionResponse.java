@@ -2,7 +2,9 @@ package com.baibus.medicalaccreditation.common.network.entities;
 
 import com.baibus.medicalaccreditation.common.db.entities.Answer;
 import com.baibus.medicalaccreditation.common.db.entities.Question;
+import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -14,15 +16,35 @@ import java.util.List;
  */
 public class QuestionResponse {
 
-    public long questionId;
-    public long questionIndex;
-    public long questionSpecializationId;
-    public String questionText;
-    public String questionFilePath;
-    public List<Answer> answers;
+    @SerializedName("modifiedTestUnits")
+    public List<ModifiedQuestion> data;
 
-    public Question getQuestion() {
-        return Question.newInstance(questionId, questionIndex, questionSpecializationId,
-                questionText, questionFilePath);
+    public static class ModifiedQuestion {
+
+        @SerializedName("testUnitId")
+        public long questionId;
+        @SerializedName("testUnitNumber")
+        public long questionIndex;
+        @SerializedName("testUnitCode")
+        public String code;
+        @SerializedName("testUnitSpecializationId")
+        public long questionSpecializationId;
+        @SerializedName("testUnitText")
+        public String questionText;
+        @SerializedName("testUnitDLFileEntryId")
+        public String questionFilePath;
+        @SerializedName("testUnitType")
+        public int type;
+        @SerializedName("testUnitCreateDate")
+        public Date createDate;
+        @SerializedName("testUnitModifiedDate")
+        public Date modifiedDate;
+        @SerializedName("testUnitAnswers")
+        public List<Answer> answers;
+
+        public Question getQuestion() {
+            return Question.newInstance(questionId, questionIndex, questionSpecializationId, code,
+                    questionText, questionFilePath, type, createDate.getTime(), modifiedDate.getTime());
+        }
     }
 }

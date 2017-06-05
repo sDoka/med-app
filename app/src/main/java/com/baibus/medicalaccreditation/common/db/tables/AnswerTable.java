@@ -24,6 +24,7 @@ public class AnswerTable {
     public static final String COLUMN_TEXT = "text";
     public static final String COLUMN_FILE_PATH = "filePath";
     public static final String COLUMN_IS_CORRECT = "isCorrect";
+    public static final String COLUMN_TYPE = "typeId";
 
     // Yep, with StorIO you can safely store queries as objects and reuse them, they are immutable
     @NonNull
@@ -63,6 +64,7 @@ public class AnswerTable {
                 + COLUMN_QUESTION_ID + " INTEGER NOT NULL, "
                 + COLUMN_TEXT + " TEXT NOT NULL, "
                 + COLUMN_FILE_PATH + " VARCHAR (200) NULL, "
+                + COLUMN_TYPE + " INTEGER NOT NULL, "
                 + COLUMN_IS_CORRECT + " SMALLINT NOT NULL"
                 + ");";
     }

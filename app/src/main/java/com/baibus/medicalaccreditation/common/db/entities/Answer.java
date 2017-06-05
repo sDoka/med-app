@@ -20,39 +20,43 @@ import org.parceler.ParcelProperty;
 @Parcel(Parcel.Serialization.BEAN)
 public class Answer {
 
-    @SerializedName("id")
+    @SerializedName("testUnitAnswerId")
     private final long mId;
 
-    @SerializedName("questionId")
+    @SerializedName("testUnitId")
     private final long mQuestionId;
 
-    @SerializedName("text")
+    @SerializedName("testUnitAnswerText")
     @NonNull
     private final String mText;
 
-    @SerializedName("filePath")
+    @SerializedName("testUnitAnswerType")
+    private final int mType;
+
+    @SerializedName("testUnitAnswerDLFileEntryId")
     @Nullable
     private final String mFilePath;
 
-    @SerializedName("correct")
+    @SerializedName("testUnitAnswerIsCorrect")
     private final boolean mIsCorrect;
 
     @ParcelConstructor
     Answer(@ParcelProperty("id") long id, @ParcelProperty("questionId") long questionId,
-                   @ParcelProperty("text") @NonNull String text,
-                   @ParcelProperty("filePath") @Nullable String filePath,
-                   @ParcelProperty("isCorrect") boolean isCorrect) {
+           @ParcelProperty("text") @NonNull String text, @ParcelProperty("type") int type,
+           @ParcelProperty("filePath") @Nullable String filePath,
+           @ParcelProperty("isCorrect") boolean isCorrect) {
         this.mId = id;
         this.mQuestionId = questionId;
         this.mText = text;
+        this.mType = type;
         this.mFilePath = filePath;
         this.mIsCorrect = isCorrect;
     }
 
     @NonNull
-    public static Answer newInstance(long id, long questionId, @NonNull String text,
+    public static Answer newInstance(long id, long questionId, @NonNull String text, int type,
                                      @Nullable String filePath, boolean isCorrect) {
-        return new Answer(id, questionId, text, filePath, isCorrect);
+        return new Answer(id, questionId, text, type, filePath, isCorrect);
     }
 
     @ParcelProperty("id")
@@ -77,6 +81,11 @@ public class Answer {
         return mFilePath;
     }
 
+    @ParcelProperty("type")
+    public int getType() {
+        return mType;
+    }
+
     public boolean hasFilePath() {
         return !TextUtils.isEmpty(mFilePath);
     }
@@ -95,6 +104,7 @@ public class Answer {
 
         return mId == that.mId
                 && mQuestionId == that.mQuestionId
+                && mType == that.mType
                 && mIsCorrect == that.mIsCorrect
                 && TextUtils.equals(mText, that.mText)
                 && TextUtils.equals(mFilePath, that.mFilePath);
@@ -105,6 +115,7 @@ public class Answer {
         int result = (int) (mId ^ (mId >>> 32));
         result = 31 * result + (int) (mQuestionId ^ (mQuestionId >>> 32));
         result = 31 * result + mText.hashCode();
+        result = 31 * result + mType;
         result = 31 * result + (mFilePath != null ? mFilePath.hashCode() : 0);
         result = 31 * result + (mIsCorrect ? 1 : 0);
         return result;
@@ -116,6 +127,7 @@ public class Answer {
                 "id=" + mId +
                 ", questionId=" + mQuestionId +
                 ", text='" + mText + '\'' +
+                ", type=" + mType +
                 ", filePath='" + mFilePath + '\'' +
                 ", isCorrect=" + mIsCorrect +
                 '}';

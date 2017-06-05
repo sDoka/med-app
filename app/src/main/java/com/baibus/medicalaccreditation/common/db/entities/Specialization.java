@@ -18,14 +18,14 @@ import org.parceler.ParcelConstructor;
 @Parcel(Parcel.Serialization.BEAN)
 public class Specialization {
 
-    @SerializedName("id")
+    @SerializedName("specializationId")
     private final long mId;
 
-    @SerializedName("name")
+    @SerializedName("nameLocalizationKey")
     @NonNull
     private final String mName;
 
-    @SerializedName("filePath")
+    @SerializedName("specializationIcon")
     @NonNull
     private final String mFilePath;
 

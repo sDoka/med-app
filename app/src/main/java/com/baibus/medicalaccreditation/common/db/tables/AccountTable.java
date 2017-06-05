@@ -21,6 +21,8 @@ public class AccountTable {
 
     public static final String COLUMN_USER_ID = "user_id";
     public static final String COLUMN_TYPE = "type";
+    public static final String COLUMN_ACTIVATION = "activationDate";
+    public static final String COLUMN_EXPIRATION = "expirationDate";
 
     @NonNull
     public static DeleteQuery deleteQuery(@NonNull Account account) {
@@ -36,6 +38,8 @@ public class AccountTable {
         return "CREATE TABLE " + TABLE + "("
                 + COLUMN_USER_ID + " INTEGER NOT NULL, "
                 + COLUMN_TYPE + " INTEGER NOT NULL,"
+                + COLUMN_ACTIVATION + " INTEGER NOT NULL,"
+                + COLUMN_EXPIRATION + " INTEGER NOT NULL,"
                 + "PRIMARY KEY (" + COLUMN_USER_ID + ", " + COLUMN_TYPE + ")"
                 + ");";
     }

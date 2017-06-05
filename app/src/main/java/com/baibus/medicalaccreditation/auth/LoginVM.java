@@ -53,9 +53,9 @@ public class LoginVM extends FragmentVM<LoginFragment>
     private final static int LOADER_AUTHENTICATE_USER = 0;
     private final static int LOADER_CHECK_USER = 1;
 
-    public final ObservableString email = new ObservableString();
+    public final ObservableString email = new ObservableString("qwerty@qwerty.com");
     public final ObservableString emailError = new ObservableString();
-    public final ObservableString password = new ObservableString();
+    public final ObservableString password = new ObservableString("qwerty");
     public final ObservableString passwordError = new ObservableString();
     private final ObservableInt mStatus = new ObservableInt();
     private final OnPropertyChangedCallback mStatusChanged = new OnPropertyChangedCallback() {
@@ -66,16 +66,18 @@ public class LoginVM extends FragmentVM<LoginFragment>
     };
 
 
-    private LoginVM(LoginFragment fragment, @NonNull Bundle savedInstanceState) {
+    private LoginVM(LoginFragment fragment, @Nullable Bundle savedInstanceState) {
         super(fragment, savedInstanceState);
 
         setTitle(fragment.getString(R.string.action_sign_in));
 
-        email.set(savedInstanceState.getString(BUNDLE_EMAIL));
-        emailError.set(savedInstanceState.getString(BUNDLE_EMAIL_ERROR));
-        password.set(savedInstanceState.getString(BUNDLE_PASSWORD));
-        passwordError.set(savedInstanceState.getString(BUNDLE_PASSWORD_ERROR));
-        mStatus.set(savedInstanceState.getInt(BUNDLE_STATUS));
+        if (savedInstanceState != null) {
+            email.set(savedInstanceState.getString(BUNDLE_EMAIL));
+            emailError.set(savedInstanceState.getString(BUNDLE_EMAIL_ERROR));
+            password.set(savedInstanceState.getString(BUNDLE_PASSWORD));
+            passwordError.set(savedInstanceState.getString(BUNDLE_PASSWORD_ERROR));
+            mStatus.set(savedInstanceState.getInt(BUNDLE_STATUS));
+        }
 
         mStatus.addOnPropertyChangedCallback(mStatusChanged);
     }
@@ -324,7 +326,7 @@ public class LoginVM extends FragmentVM<LoginFragment>
                     .object(registrationResponse.getAccount())
                     .prepare()
                     .executeAsBlocking();
-            if (result.wasInserted()) return true;
+            if (result.wasInserted() || result.wasUpdated()) return true;
             throw new StorIOException("User not been saved");
         }
     }
@@ -333,7 +335,7 @@ public class LoginVM extends FragmentVM<LoginFragment>
         @NonNull
         @Override
         public LoginVM create(LoginFragment view) {
-            return new LoginVM(view, view.getArguments());
+            return new LoginVM(view, null);
         }
 
         @NonNull

@@ -26,7 +26,8 @@ public class RegistrationResponse {
     }
 
     public Account getAccount() {
-        return Account.newInstance(userId, userAccountTypeId);
+        //TODO
+        return Account.newInstance(userId, userAccountTypeId, 0, 0);
     }
 
 }

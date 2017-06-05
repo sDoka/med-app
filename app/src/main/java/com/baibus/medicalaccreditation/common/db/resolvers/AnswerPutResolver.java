@@ -44,6 +44,7 @@ public class AnswerPutResolver extends DefaultPutResolver<Answer> {
         contentValues.put(AnswerTable.COLUMN_ID, object.getId());
         contentValues.put(AnswerTable.COLUMN_QUESTION_ID, object.getQuestionId());
         contentValues.put(AnswerTable.COLUMN_TEXT, object.getText());
+        contentValues.put(AnswerTable.COLUMN_TYPE, object.getType());
         contentValues.put(AnswerTable.COLUMN_FILE_PATH, object.getFilePath());
         contentValues.put(AnswerTable.COLUMN_IS_CORRECT, object.isCorrect() ? 1 : 0);
 

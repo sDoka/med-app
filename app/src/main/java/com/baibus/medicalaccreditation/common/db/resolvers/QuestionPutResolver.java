@@ -45,7 +45,11 @@ public class QuestionPutResolver extends DefaultPutResolver<Question> {
         contentValues.put(QuestionTable.COLUMN_INDEX, object.getIndex());
         contentValues.put(QuestionTable.COLUMN_SPECIALIZATION_ID, object.getSpecializationId());
         contentValues.put(QuestionTable.COLUMN_TEXT, object.getText());
+        contentValues.put(QuestionTable.COLUMN_CODE, object.getCode());
         contentValues.put(QuestionTable.COLUMN_FILE_PATH, object.getFilePath());
+        contentValues.put(QuestionTable.COLUMN_TYPE, object.getType());
+        contentValues.put(QuestionTable.COLUMN_CREATED, object.getCreateDate());
+        contentValues.put(QuestionTable.COLUMN_MODIFIED, object.getModifiedDate());
 
         return contentValues;
     }

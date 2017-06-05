@@ -11,6 +11,15 @@ import android.text.TextUtils;
  * To change this template use File | settings | File Templates.
  */
 public class ObservableString extends ObservableField<String> {
+
+    public ObservableString(String value) {
+        super(value);
+    }
+
+    public ObservableString() {
+        super();
+    }
+
     @Override
     public void set(String value) {
         if (!TextUtils.equals(value, get()))

@@ -1,7 +1,10 @@
 package com.baibus.medicalaccreditation.common.network;
 
+import com.baibus.medicalaccreditation.common.db.entities.Account;
+import com.baibus.medicalaccreditation.common.db.entities.Specialization;
+import com.baibus.medicalaccreditation.common.network.entities.AccountResponse;
+import com.baibus.medicalaccreditation.common.network.entities.AttemptsResponse;
 import com.baibus.medicalaccreditation.common.network.entities.QuestionResponse;
-import com.baibus.medicalaccreditation.common.network.entities.SpecializationsResponse;
 import com.baibus.medicalaccreditation.common.network.retrofit.RestApi;
 
 import java.util.List;
@@ -23,16 +26,34 @@ public class RestApiImpl {
         mRestApi = restApi;
     }
 
-    public Observable<List<QuestionResponse>> question() {
-        return mRestApi
-                .questions()
-                .map(apiResponseResponse -> apiResponseResponse.body().data);
-    }
-
-
-    public Observable<SpecializationsResponse> specializations() {
+    public Observable<List<Specialization>> specializations() {
         return mRestApi
                 .specializations()
-                .map(apiResponseResponse -> apiResponseResponse.body().data);
+                .map(apiResponseResponse -> apiResponseResponse.body().data.data);
     }
+
+    public Observable<List<QuestionResponse.ModifiedQuestion>> question(long specializationId) {
+        return mRestApi
+                .questions(specializationId)
+                .map(apiResponseResponse -> apiResponseResponse.body().data.data);
+    }
+
+    public Observable<List<Long>> removedQuestions(long specializationId) {
+        return mRestApi
+                .removedQuestions(specializationId)
+                .map(apiResponseResponse -> apiResponseResponse.body().data.data.ids);
+    }
+
+    public Observable<List<AttemptsResponse.UnitAttempts>> attempts(long userId, long date) {
+        return mRestApi
+                .attempts(userId, date)
+                .map(apiResponseResponse -> apiResponseResponse.body().data.data);
+    }
+
+    public Observable<List<Account>> accounts(long userId) {
+        return mRestApi
+                .accounts(userId)
+                .map(apiResponseResponse -> apiResponseResponse.body().data.data);
+    }
+
 }

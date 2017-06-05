@@ -5,6 +5,7 @@ import android.databinding.ObservableInt;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.baibus.medicalaccreditation.MedApplication;
@@ -67,8 +68,13 @@ public class TestingVM extends FragmentVM<TestingFragment> implements OnQuestion
                 .unwrap(savedInstanceState.getParcelable(BUNDLE_ITEMS));
         if (questionArrayList != null) setItems(questionArrayList);
         position.set(savedInstanceState.getInt(BUNDLE_POSITION));
-        if (items.isEmpty()) loadQuestions(false);
         specialization.addOnPropertyChangedCallback(mSpecializationChanged);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (items.isEmpty()) loadQuestions(false);
     }
 
     public void setTitle(int position) {

@@ -10,12 +10,12 @@ public class DummyContent {
             "    {\n" +
             "      \"id\": 1,\n" +
             "      \"name\": \"Dummy Spec 1\",\n" +
-            "      \"questionFilePath\": \"http://denta-lain.ru/img/logozub.png\"\n" +
+            "      \"filePath\": \"http://denta-lain.ru/img/logozub.png\"\n" +
             "    },\n" +
             "    {\n" +
             "      \"id\": 2,\n" +
             "      \"name\": \"Dummy Spec 2\",\n" +
-            "      \"questionFilePath\": \"http://leshaigraet.ru/wp-content/uploads/2015/09/m.png\"\n" +
+            "      \"filePath\": \"http://leshaigraet.ru/wp-content/uploads/2015/09/m.png\"\n" +
             "    }\n" +
             "  ]\n" +
             "}";

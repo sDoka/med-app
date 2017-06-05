@@ -43,6 +43,8 @@ public class AccountPutResolver extends DefaultPutResolver<Account> {
 
         contentValues.put(AccountTable.COLUMN_USER_ID, object.getUserId());
         contentValues.put(AccountTable.COLUMN_TYPE, object.getType());
+        contentValues.put(AccountTable.COLUMN_ACTIVATION, object.getActivationDate());
+        contentValues.put(AccountTable.COLUMN_EXPIRATION, object.getExpirationDate());
 
         return contentValues;
     }

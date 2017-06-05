@@ -34,6 +34,8 @@ public class UserTable {
     @NonNull
     public static final DeleteQuery DELETE_ALL = DeleteQuery.builder()
             .table(UserTable.TABLE)
+            .where("1 = ?")
+            .whereArgs(1)
             .build();
 
 
