@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import com.pushtorefresh.storio.sqlite.queries.DeleteQuery;
 import com.pushtorefresh.storio.sqlite.queries.Query;
 
+import static com.baibus.medicalaccreditation.common.db.tables.AttemptTable.COLUMN_QUESTION_ID;
+
 /**
  * Created by Android Studio.
  * User: yanbaev.is
@@ -55,6 +57,14 @@ public class QuestionTable {
         return Query.builder()
                 .table(TABLE)
                 .where(COLUMN_SPECIALIZATION_ID + " = ?")
+                .whereArgs(id)
+                .build();
+    }
+
+    public static @NonNull Query queryNotAttempted(long id) {
+        return Query.builder()
+                .table(TABLE)
+                .where(COLUMN_SPECIALIZATION_ID + " = ? AND " + COLUMN_ID + " NOT IN (SELECT " + COLUMN_QUESTION_ID + " FROM " + AttemptTable.TABLE + ")")
                 .whereArgs(id)
                 .build();
     }

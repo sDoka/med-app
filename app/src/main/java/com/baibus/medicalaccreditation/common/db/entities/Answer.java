@@ -87,7 +87,7 @@ public class Answer {
     }
 
     public boolean hasFilePath() {
-        return !TextUtils.isEmpty(mFilePath);
+        return !TextUtils.isEmpty(mFilePath) && !TextUtils.equals("0", mFilePath);//wtf???
     }
 
     @ParcelProperty("isCorrect")

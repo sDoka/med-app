@@ -7,6 +7,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.baibus.medicalaccreditation.BR;
 import com.baibus.medicalaccreditation.base.ActivityVM;
 import com.baibus.medicalaccreditation.base.ActivityVMFactory;
 import com.baibus.medicalaccreditation.base.RxLoader;
@@ -16,7 +17,6 @@ import com.baibus.medicalaccreditation.common.db.tables.AnswerTable;
 import com.baibus.medicalaccreditation.common.db.tables.AttemptTable;
 import com.baibus.medicalaccreditation.common.db.tables.QuestionTable;
 import com.baibus.medicalaccreditation.common.network.ApiError;
-import com.baibus.medicalaccreditation.common.network.entities.AttemptsResponse;
 import com.baibus.medicalaccreditation.common.network.entities.QuestionResponse;
 import com.baibus.medicalaccreditation.common.provider.ApiModule;
 import com.baibus.medicalaccreditation.main.MainActivity;
@@ -63,6 +63,8 @@ public class UpdateVM extends ActivityVM<UpdateActivity> {
         if (savedInstanceState != null) {
             error.set(savedInstanceState.getString(BUNDLE_ERROR));
             mStatus.set(savedInstanceState.getInt(BUNDLE_STATUS));
+        } else {
+            mStatusChanged.onPropertyChanged(mStatus, BR._all);
         }
 
         mStatus.addOnPropertyChangedCallback(mStatusChanged);
@@ -134,7 +136,7 @@ public class UpdateVM extends ActivityVM<UpdateActivity> {
     }
 
     private void updateSuccess(Boolean result) {
-        mStatus.set(NOTHING);
+        //mStatus.set(NOTHING);
         activity.startActivity(MainActivity.getStartIntent());
         activity.finish();
     }
@@ -193,27 +195,27 @@ public class UpdateVM extends ActivityVM<UpdateActivity> {
                     }
                     return result;
                 })
-                .flatMap(aBoolean -> ApiModule
-                        .getRestApi()
-                        .attempts(user.getId(), user.getLastSynchronization().getTime()))
-                .flatMap(Observable::from)
-                .map(AttemptsResponse.UnitAttempts::getAttempt)
-                .toList()
-                .flatMap(attempts -> ApiModule
-                        .getStoreIOSQLite()
-                        .put()
-                        .objects(attempts)
-                        .prepare()
-                        .asRxObservable())
-                .flatMap(attemptPutResults -> ApiModule
-                        .getRestApi().accounts(user.getId()))
-                .flatMap(accounts -> ApiModule
-                        .getStoreIOSQLite()
-                        .put()
-                        .objects(accounts)
-                        .prepare()
-                        .asRxObservable())
-                .map(accountPutResults -> true)
+//                .flatMap(aBoolean -> ApiModule
+//                        .getRestApi()
+//                        .attempts(user.getId(), user.getLastSynchronization().getTime()))
+//                .flatMap(Observable::from)
+//                .map(AttemptsResponse.UnitAttempts::getAttempt)
+//                .toList()
+//                .flatMap(attempts -> ApiModule
+//                        .getStoreIOSQLite()
+//                        .put()
+//                        .objects(attempts)
+//                        .prepare()
+//                        .asRxObservable())
+//                .flatMap(attemptPutResults -> ApiModule
+//                        .getRestApi().accounts(user.getId()))
+//                .flatMap(accounts -> ApiModule
+//                        .getStoreIOSQLite()
+//                        .put()
+//                        .objects(accounts)
+//                        .prepare()
+//                        .asRxObservable())
+//                .map(accountPutResults -> true)
 
 
                 ;

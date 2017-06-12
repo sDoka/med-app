@@ -6,6 +6,8 @@ import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.baibus.medicalaccreditation.MedApplication;
 import com.baibus.medicalaccreditation.common.db.entities.Specialization;
@@ -96,6 +98,14 @@ public abstract class FragmentVM<F extends Fragment> extends BaseObservable {
     }
 
     public void onViewStateRestored(Bundle savedInstanceState) {
+
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return false;
+    }
+
+    public void onPrepareOptionsMenu(Menu menu) {
 
     }
 

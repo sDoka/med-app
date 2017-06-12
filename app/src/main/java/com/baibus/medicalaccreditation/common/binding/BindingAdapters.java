@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.databinding.BindingAdapter;
+import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.databinding.adapters.ListenerUtil;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -14,9 +16,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 
+import com.baibus.medicalaccreditation.BR;
 import com.baibus.medicalaccreditation.R;
 import com.baibus.medicalaccreditation.databinding.PartialNavHeaderMainBinding;
 import com.baibus.medicalaccreditation.main.MainVM;
@@ -86,26 +88,20 @@ public class BindingAdapters {
 
     @BindingAdapter({"model"})
     public static void loadHeader(NavigationView view, MainVM model) {
-        PartialNavHeaderMainBinding binding =
-                PartialNavHeaderMainBinding.inflate(LayoutInflater.from(view.getContext()));
-        binding.setViewModel(model);
-        binding.executePendingBindings();
-        View oldView;
-        while ((oldView = view.getHeaderView(0)) != null) {
-            view.removeHeaderView(oldView);
+        View viewHeaderView = view.getHeaderView(0);
+        if (viewHeaderView != null) {
+            ViewDataBinding binding = DataBindingUtil.bind(viewHeaderView);
+            if (binding != null) {
+                binding.setVariable(BR.viewModel, model);
+                //binding.executePendingBindings();
+            }
         }
-        view.addHeaderView(binding.getRoot());
     }
 
     @BindingAdapter({"colorProgress"})
     public static void setColorProgressBar(ProgressBar bar, @ColorRes int color) {
         bar.getProgressDrawable().setColorFilter(ContextCompat.getColor(bar.getContext(), color),
                 PorterDuff.Mode.SRC_IN);
-    }
-
-    @BindingAdapter("errorText")
-    public static void bindError(EditText view, CharSequence error) {
-        view.setError(error);
     }
 
     private static class VisibilityAnimatorListenerAdapter extends AnimatorListenerAdapter {

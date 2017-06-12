@@ -1,8 +1,8 @@
 package com.baibus.medicalaccreditation;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.os.StrictMode;
-import android.support.annotation.NonNull;
 
 import com.baibus.medicalaccreditation.common.db.entities.Specialization;
 import com.baibus.medicalaccreditation.common.db.entities.User;
@@ -12,10 +12,6 @@ import com.baibus.medicalaccreditation.common.provider.ApiModule;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.stetho.Stetho;
 import com.pushtorefresh.storio.sqlite.queries.Query;
-import com.squareup.leakcanary.AndroidExcludedRefs;
-import com.squareup.leakcanary.ExcludedRefs;
-import com.squareup.leakcanary.LeakCanary;
-import com.squareup.leakcanary.RefWatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +31,9 @@ import timber.log.Timber;
  */
 public class MedApplication extends Application {
 
+    private final static String APP_PREFERENCES = "APP_PREFERENCES";
+    private final static String APP_PREFERENCES_SPECIALIZATION_ID = "specializationId";
+
     private static MedApplication instance;
     public static MedApplication getInstance() {
         return instance;
@@ -45,25 +44,16 @@ public class MedApplication extends Application {
     private BehaviorSubject<List<Specialization>> specializations;
     private BehaviorSubject<Long> specializationId;
 
-    // Monitors Memory Leaks, because why not!
-    // You can play with sample app and Rx subscriptions
-    // To see how it can leak memory if you won't unsubscribe.
-    private RefWatcher refWatcher;
-
+    private SharedPreferences mPreferences;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return;
-        }
         instance = this;
-        // Normal app init code...
-        installLeakCanary();
         Timber.plant(new Timber.DebugTree());
         Fresco.initialize(this);
+
+        mPreferences = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
 
         Stetho.initializeWithDefaults(this);
 
@@ -73,33 +63,18 @@ public class MedApplication extends Application {
 
         user = BehaviorSubject.create();
         specialization = BehaviorSubject.create();
-        specializationId = BehaviorSubject.create(-1L);
+        specializationId = BehaviorSubject.create(mPreferences.getLong(APP_PREFERENCES_SPECIALIZATION_ID, -1L));
         specializations = BehaviorSubject.create(new ArrayList<>());
 
-        //android.view.inputmethod.InputMethodManager;$ControlledInputConnectionWrapper
-    }
-
-    private void installLeakCanary() {
-        ExcludedRefs excludedRefs = AndroidExcludedRefs.createAppDefaults()
-                .instanceField("android.support.design.widget.TextInputEditText", "mContext")
-                .clazz("android.view.inputmethod.InputMethodManager$ControlledInputConnectionWrapper")
-                .clazz("android.view.inputmethod.InputMethodManager")
-                .build();
-        refWatcher = LeakCanary.refWatcher(this)
-                .excludedRefs(excludedRefs)
-                .buildAndInstall();
-//        refWatcher = LeakCanary.install(this);
-    }
-
-    @NonNull
-    public RefWatcher refWatcher() {
-        return refWatcher;
     }
 
     public void setSpecializationId(long specializationId) {
         if (specializationId != this.specializationId.getValue()) {
             this.specializationId.onNext(specializationId);
             this.reloadSpecialization();
+            SharedPreferences.Editor editor = mPreferences.edit();
+            editor.putLong(APP_PREFERENCES_SPECIALIZATION_ID, specializationId);
+            editor.apply();
         }
     }
 

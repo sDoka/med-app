@@ -116,9 +116,9 @@ dependencies {
 
     //LeakCanary
 //    compile libraries.leakCanaryNoOp
-    debugCompile libraries.leakCanary
-    releaseCompile libraries.leakCanaryNoOp
-    testCompile libraries.leakCanaryNoOp
+//    debugCompile libraries.leakCanary
+//    releaseCompile libraries.leakCanaryNoOp
+//    testCompile libraries.leakCanaryNoOp
 
     //logger
     compile libraries.timber

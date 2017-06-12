@@ -1,6 +1,7 @@
 package com.baibus.medicalaccreditation.common.db.entities;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.parceler.Parcel;
 import org.parceler.ParcelConstructor;
@@ -15,7 +16,8 @@ import org.parceler.ParcelConstructor;
 @Parcel(Parcel.Serialization.BEAN)
 public class Attempt {
 
-    private final long mId;
+    @Nullable
+    private final Long mId;
 
     private final long mQuestionId;
 
@@ -24,7 +26,7 @@ public class Attempt {
     private final long mTime;
 
     @ParcelConstructor
-    Attempt(long id, long questionId, long answerId, long time) {
+    Attempt(Long id, long questionId, long answerId, long time) {
         this.mId = id;
         this.mQuestionId = questionId;
         this.mAnswerId = answerId;
@@ -32,11 +34,12 @@ public class Attempt {
     }
 
     @NonNull
-    public static Attempt newInstance(long id, long questionId, long answerId, long time) {
+    public static Attempt newInstance(Long id, long questionId, long answerId, long time) {
         return new Attempt(id, questionId, answerId, time);
     }
 
-    public long getId() {
+    @Nullable
+    public Long getId() {
         return mId;
     }
 
@@ -59,16 +62,16 @@ public class Attempt {
 
         Attempt attempt = (Attempt) o;
 
-        return mId == attempt.mId
-                && mQuestionId == attempt.mQuestionId
-                && mAnswerId == attempt.mAnswerId
-                && mTime == attempt.mTime;
+        if (mQuestionId != attempt.mQuestionId) return false;
+        if (mAnswerId != attempt.mAnswerId) return false;
+        if (mTime != attempt.mTime) return false;
+        return mId != null ? mId.equals(attempt.mId) : attempt.mId == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (mId ^ (mId >>> 32));
+        int result = mId != null ? mId.hashCode() : 0;
         result = 31 * result + (int) (mQuestionId ^ (mQuestionId >>> 32));
         result = 31 * result + (int) (mAnswerId ^ (mAnswerId >>> 32));
         result = 31 * result + (int) (mTime ^ (mTime >>> 32));

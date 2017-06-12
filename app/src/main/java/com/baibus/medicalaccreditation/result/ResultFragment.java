@@ -1,4 +1,4 @@
-package com.baibus.medicalaccreditation.testing;
+package com.baibus.medicalaccreditation.result;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -8,7 +8,7 @@ import android.support.v4.view.ViewPager;
 import com.baibus.medicalaccreditation.BR;
 import com.baibus.medicalaccreditation.R;
 import com.baibus.medicalaccreditation.base.Fragment;
-import com.baibus.medicalaccreditation.databinding.FragmentTestingBinding;
+import com.baibus.medicalaccreditation.databinding.FragmentResultBinding;
 import com.baibus.medicalaccreditation.main.MainActivity;
 
 import java.lang.ref.WeakReference;
@@ -21,14 +21,14 @@ import java.lang.ref.WeakReference;
  * Time: 8:27
  * To change this template use File | settings | File Templates.
  */
-public class TestingFragment extends Fragment<TestingFragment, FragmentTestingBinding, TestingVM, TestingVM.FactoryVM> {
-    public final static String TAG = TestingFragment.class.getName();
+public class ResultFragment extends Fragment<ResultFragment, FragmentResultBinding, ResultVM, ResultVM.FactoryVM> {
+    public final static String TAG = ResultFragment.class.getName();
 
-    public static TestingFragment newInstance() {
+    public static ResultFragment newInstance() {
 
         Bundle args = new Bundle();
 
-        TestingFragment fragment = new TestingFragment();
+        ResultFragment fragment = new ResultFragment();
         fragment.setArguments(args);
         return fragment;
     }
@@ -40,18 +40,18 @@ public class TestingFragment extends Fragment<TestingFragment, FragmentTestingBi
 
     @Override
     public int getLayoutId() {
-        return R.layout.fragment_testing;
+        return R.layout.fragment_result;
     }
 
     @NonNull
     @Override
-    protected TestingVM.FactoryVM getFactory() {
-        return new TestingVM.FactoryVM();
+    protected ResultVM.FactoryVM getFactory() {
+        return new ResultVM.FactoryVM();
     }
 
     @NonNull
     @Override
-    protected TestingFragment getThis() {
+    protected ResultFragment getThis() {
         return this;
     }
 
@@ -67,14 +67,7 @@ public class TestingFragment extends Fragment<TestingFragment, FragmentTestingBi
 
     private void initPager() {
         binding.viewPager.addOnPageChangeListener(new OnPageChangeListener(this));
-        setCurrentItem(viewModel.position.get(), false);
-    }
-
-    void showResult() {
-        Activity activity = getActivity();
-        if (activity instanceof MainActivity) {
-            ((MainActivity) activity).viewModel.startShowResults();
-        }
+        binding.viewPager.setCurrentItem(viewModel.position.get(), false);
     }
 
     void startTestAgain() {
@@ -84,20 +77,16 @@ public class TestingFragment extends Fragment<TestingFragment, FragmentTestingBi
         }
     }
 
-    void setCurrentItem(int position, boolean smoothScroll) {
-        binding.viewPager.setCurrentItem(position, smoothScroll);
-    }
-
     @Override
     public int getMenu() {
-        return R.menu.fragment_testing;
+        return R.menu.fragment_result;
     }
 
     private static class OnPageChangeListener implements ViewPager.OnPageChangeListener {
-        private final WeakReference<TestingFragment> mTestingFragment;
+        private final WeakReference<ResultFragment> mResultFragment;
 
-        OnPageChangeListener(TestingFragment testingFragment) {
-            mTestingFragment = new WeakReference<>(testingFragment);
+        OnPageChangeListener(ResultFragment resultFragment) {
+            mResultFragment = new WeakReference<>(resultFragment);
         }
 
         @Override
@@ -107,9 +96,9 @@ public class TestingFragment extends Fragment<TestingFragment, FragmentTestingBi
 
         @Override
         public void onPageSelected(int position) {
-            final TestingFragment testingFragment = mTestingFragment.get();
-            if (testingFragment != null) {
-                final TestingVM testingVM = testingFragment.viewModel;
+            final ResultFragment resultFragment = mResultFragment.get();
+            if (resultFragment != null) {
+                final ResultVM testingVM = resultFragment.viewModel;
                 if (testingVM != null && testingVM.position.get() != position) {
                     testingVM.setTitle(position);
                 }

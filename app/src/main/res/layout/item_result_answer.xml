@@ -11,14 +11,14 @@
         <import type="com.baibus.medicalaccreditation.common.binding.ProgressBarFactory" alias="progress"/>
         <import type="android.view.View" alias="view"/>
         <variable name="itemViewModel" type="com.baibus.medicalaccreditation.common.db.entities.Answer"/>
-        <variable name="listener" type="com.baibus.medicalaccreditation.testing.OnAnswerAttemptedListener"/>
+        <variable name="resultAnswerId" type="long"/>
     </data>
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="@{() -> listener.onAnswerAttempted(itemViewModel)}"
+        android:background="@{resultAnswerId == itemViewModel.id ? (itemViewModel.correct ? @color/colorCorrect : @color/colorIncorrect) : (itemViewModel.correct ? @color/colorCorrect : @android:color/white)}"
         android:foreground="?android:attr/selectableItemBackground">
 
         <com.baibus.medicalaccreditation.common.ui.custom.SquareFrameLayout

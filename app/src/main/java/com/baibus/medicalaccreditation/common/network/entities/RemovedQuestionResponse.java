@@ -17,10 +17,10 @@ import java.util.List;
 public class RemovedQuestionResponse {
 
     @SerializedName("removedTestUnitIds")
-    public RemovedQuestion data;
+    public List<RemovedQuestion> data;
 
     public static class RemovedQuestion {
         @SerializedName("testUnitId")
-        public List<Long> ids;
+        public Long id;
     }
 }

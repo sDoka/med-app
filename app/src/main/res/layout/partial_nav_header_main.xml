@@ -13,8 +13,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/nav_header_height"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark">
+        android:layout_height="@dimen/nav_header_height">
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:layout_width="0dp"
@@ -26,6 +25,7 @@
             bind:progressBarImage="@{progress.newInstance(0x800080FF)}"
             fresco:placeholderImage="@drawable/side_nav_bar"
             fresco:roundAsCircle="false"
+            fresco:actualImageScaleType="fitCenter"
             bind:imageURI='@{viewModel.specialization.filePath}'/>
 
         <TextView
@@ -35,11 +35,14 @@
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:paddingTop="16dp"
+            android:paddingBottom="4dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/textUser"
             app:layout_constraintRight_toRightOf="parent"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:text='@{viewModel.specialization.name}'
+            android:textColor="@android:color/black"
             android:onClick="@{(v) -> viewModel.changeSpecialization()}"
             tools:text="Специализация"/>
 
@@ -52,6 +55,7 @@
             android:layout_marginBottom="@dimen/nav_header_vertical_spacing"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
+            android:textColor="@color/cardview_dark_background"
             android:text='@{viewModel.user.name}'
             tools:text="Иванов Иван"/>
 

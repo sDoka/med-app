@@ -8,7 +8,9 @@ import android.databinding.ObservableInt;
 import com.baibus.medicalaccreditation.BR;
 import com.baibus.medicalaccreditation.R;
 import com.baibus.medicalaccreditation.common.db.entities.Answer;
+import com.baibus.medicalaccreditation.common.db.entities.Attempt;
 import com.baibus.medicalaccreditation.common.db.entities.Question;
+import com.baibus.medicalaccreditation.common.provider.ApiModule;
 
 import org.parceler.Parcel;
 import org.parceler.ParcelConstructor;
@@ -17,6 +19,7 @@ import org.parceler.Transient;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import me.tatarka.bindingcollectionadapter2.ItemBinding;
@@ -38,8 +41,7 @@ public class QuestionVM extends BaseObservable implements OnAnswerAttemptedListe
     @Transient
     public final ItemBinding<Answer> itemBinding = ItemBinding
             .<Answer>of(BR.itemViewModel, R.layout.item_answer)
-            .bindExtra(BR.listener, QuestionVM.this)
-            .bindExtra(BR.position, position);
+            .bindExtra(BR.listener, QuestionVM.this);
 
     @ParcelConstructor
     QuestionVM(@ParcelProperty("position") int position,
@@ -57,7 +59,14 @@ public class QuestionVM extends BaseObservable implements OnAnswerAttemptedListe
     }
 
     @Override
-    public void onAnswerAttempted(Answer answer, int position) {
+    public void onAnswerAttempted(Answer answer) {
+        ApiModule
+                .getStoreIOSQLite()
+                .put()
+                .object(Attempt.newInstance(null, question.get().getId(), answer.getId(), new Date().getTime()))
+                .prepare()
+                .asRxObservable()
+                .subscribe();
         OnQuestionAttemptedListener listener = mListener.get();
         if (listener != null) {
             listener.onQuestionAttempted(this.question.get(), this.position.get());

@@ -5,11 +5,13 @@ import com.baibus.medicalaccreditation.common.db.entities.Specialization;
 import com.baibus.medicalaccreditation.common.network.entities.AccountResponse;
 import com.baibus.medicalaccreditation.common.network.entities.AttemptsResponse;
 import com.baibus.medicalaccreditation.common.network.entities.QuestionResponse;
+import com.baibus.medicalaccreditation.common.network.entities.RemovedQuestionResponse;
 import com.baibus.medicalaccreditation.common.network.retrofit.RestApi;
 
 import java.util.List;
 
 import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * Created by Android Studio.
@@ -41,7 +43,10 @@ public class RestApiImpl {
     public Observable<List<Long>> removedQuestions(long specializationId) {
         return mRestApi
                 .removedQuestions(specializationId)
-                .map(apiResponseResponse -> apiResponseResponse.body().data.data.ids);
+                .map(apiResponseResponse -> apiResponseResponse.body().data.data)
+                .flatMap(Observable::from)
+                .map(removedQuestion -> removedQuestion.id)
+                .toList();
     }
 
     public Observable<List<AttemptsResponse.UnitAttempts>> attempts(long userId, long date) {

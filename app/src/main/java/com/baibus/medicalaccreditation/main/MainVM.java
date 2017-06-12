@@ -9,9 +9,18 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.MenuItem;
 
+import com.baibus.medicalaccreditation.BR;
+import com.baibus.medicalaccreditation.R;
+import com.baibus.medicalaccreditation.auth.AuthActivity;
 import com.baibus.medicalaccreditation.base.ActivityVM;
 import com.baibus.medicalaccreditation.base.ActivityVMFactory;
+import com.baibus.medicalaccreditation.common.db.tables.AttemptTable;
+import com.baibus.medicalaccreditation.common.db.tables.QuestionTable;
+import com.baibus.medicalaccreditation.common.provider.ApiModule;
+import com.baibus.medicalaccreditation.result.ResultFragment;
 import com.baibus.medicalaccreditation.testing.TestingFragment;
+
+import static android.support.v4.view.GravityCompat.START;
 
 /**
  * Created by Android Studio.
@@ -27,7 +36,15 @@ public class MainVM extends ActivityVM<MainActivity> {
         @Override
         public void onPropertyChanged(Observable observable, int i) {
             if (specialization.get() != null) {
-                removeAllAndReplaceFragments(TestingFragment.newInstance(), TestingFragment.TAG);
+                int notAttempted = ApiModule
+                        .getStoreIOSQLite()
+                        .get()
+                        .numberOfResults()
+                        .withQuery(QuestionTable.queryNotAttempted(specialization.get().getId()))
+                        .prepare()
+                        .executeAsBlocking();
+                if (notAttempted > 0) startTest();
+                else startShowResults();
             }
         }
     };
@@ -35,9 +52,11 @@ public class MainVM extends ActivityVM<MainActivity> {
     private MainVM(MainActivity activity, @Nullable Bundle savedInstanceState) {
         super(activity, savedInstanceState);
         if (savedInstanceState == null) {
-            changeSpecialization();
-//            removeAllAndReplaceFragments(TestingFragment.newInstance(), TestingFragment.TAG);
-//            activity.binding.navViewMain.setCheckedItem(R.id.menu_calendar);
+            if (specialization.get() == null) {
+                changeSpecialization(true);
+            } else {
+                mSpecializationChangedCallback.onPropertyChanged(specialization, BR._all);
+            }
         }
         specialization.addOnPropertyChangedCallback(mSpecializationChangedCallback);
     }
@@ -53,12 +72,25 @@ public class MainVM extends ActivityVM<MainActivity> {
         specialization.removeOnPropertyChangedCallback(mSpecializationChangedCallback);
     }
 
+    @Override
+    public boolean onBackKeyPress() {
+        if (activity.binding.drawerLayout.isDrawerOpen(START)) {
+            activity.binding.drawerLayout.closeDrawer(START);
+            return true;
+        }
+        return super.onBackKeyPress();
+    }
+
     public void fabOnClick() {
 
     }
 
     public void changeSpecialization() {
-        SpecializationSelectDialog newFragment = SpecializationSelectDialog.newInstance();
+        changeSpecialization(false);
+    }
+
+    private void changeSpecialization(boolean need) {
+        SpecializationSelectDialog newFragment = SpecializationSelectDialog.newInstance(need);
 
         FragmentManager fm = activity.getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
@@ -71,7 +103,37 @@ public class MainVM extends ActivityVM<MainActivity> {
     }
 
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.change_spec:
+                activity.binding.drawerLayout.closeDrawer(START);
+                changeSpecialization();
+                return true;
+            case R.id.logout:
+                activity.startActivity(AuthActivity.getStartIntent());
+                activity.finish();
+                return true;
+        }
+
         return false;
+    }
+
+    private void startTest() {
+        removeAllAndReplaceFragments(TestingFragment.newInstance(), TestingFragment.TAG);
+    }
+
+    public void startTestAgain() {
+        ApiModule
+                .getStoreIOSQLite()
+                .delete()
+                .byQuery(AttemptTable.deleteSpecializationId(specialization.get().getId()))
+                .prepare()
+                .executeAsBlocking();
+
+        startTest();
+    }
+
+    public void startShowResults() {
+        removeAllAndReplaceFragments(ResultFragment.newInstance(), ResultFragment.TAG);
     }
 
     static class FactoryVM implements ActivityVMFactory<MainVM, MainActivity> {

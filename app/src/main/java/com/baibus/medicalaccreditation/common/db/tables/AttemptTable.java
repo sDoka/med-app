@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.pushtorefresh.storio.sqlite.queries.DeleteQuery;
 import com.pushtorefresh.storio.sqlite.queries.Query;
+import com.pushtorefresh.storio.sqlite.queries.RawQuery;
 
 /**
  * Created by Android Studio.
@@ -44,6 +45,23 @@ public class AttemptTable {
                 .table(TABLE)
                 .where(COLUMN_QUESTION_ID + " IN (?)")
                 .whereArgs(ids)
+                .build();
+    }
+
+    public static @NonNull
+    DeleteQuery deleteSpecializationId(long id) {
+        return DeleteQuery.builder()
+                .table(TABLE)
+                .where(COLUMN_QUESTION_ID + " IN (SELECT q." + QuestionTable.COLUMN_ID + " FROM " + QuestionTable.TABLE + " q WHERE q." + QuestionTable.COLUMN_SPECIALIZATION_ID + " = ?)")
+                .whereArgs(id)
+                .build();
+    }
+
+    public static @NonNull Query querySpecializationId(long id) {
+        return Query.builder()
+                .table(TABLE + " INNER JOIN " + QuestionTable.TABLE + " q ON q." + QuestionTable.COLUMN_ID + " = " + COLUMN_QUESTION_ID)
+                .where(QuestionTable.COLUMN_SPECIALIZATION_ID + " = ?")
+                .whereArgs(id)
                 .build();
     }
 

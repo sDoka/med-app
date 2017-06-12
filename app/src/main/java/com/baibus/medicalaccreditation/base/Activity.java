@@ -162,10 +162,10 @@ public abstract class Activity<C extends Activity, B extends ViewDataBinding, VM
 		}
 		binding.unbind();
 		binding = null;
-		MedApplication.getInstance().refWatcher().watch(this);
-		if (viewModel != null) {
-			MedApplication.getInstance().refWatcher().watch(viewModel);
-		}
+//		MedApplication.getInstance().refWatcher().watch(this);
+//		if (viewModel != null) {
+//			MedApplication.getInstance().refWatcher().watch(viewModel);
+//		}
 	}
 
 	@Override

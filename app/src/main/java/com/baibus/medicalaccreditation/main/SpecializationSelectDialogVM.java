@@ -34,7 +34,7 @@ import static android.content.DialogInterface.BUTTON_POSITIVE;
  */
 class SpecializationSelectDialogVM extends DialogFragmentVM<SpecializationSelectDialog>
         implements DialogInterface.OnClickListener {
-
+    final static String ARGUMENT_IS_NEED = "need";
 
     private final static String BUNDLE_SELECTION = "selectedPosition";
 
@@ -60,8 +60,12 @@ class SpecializationSelectDialogVM extends DialogFragmentVM<SpecializationSelect
         builder.setTitle("Выберите специализацию");
         builder.setSingleChoiceItems(new SpecializationAdapter(specializations), selectedPosition, this);
         builder.setPositiveButton(android.R.string.ok, this);
-        builder.setNegativeButton(android.R.string.cancel, this);
-        builder.setCancelable(false);
+        if (fragment.getArguments().getBoolean(ARGUMENT_IS_NEED)) {
+            builder.setCancelable(false);
+        } else {
+            builder.setNegativeButton(android.R.string.cancel, this);
+            builder.setCancelable(true);
+        }
 
         return builder.create();
     }

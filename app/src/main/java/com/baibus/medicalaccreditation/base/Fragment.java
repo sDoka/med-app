@@ -11,11 +11,11 @@ import android.support.annotation.MenuRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
-
-import com.baibus.medicalaccreditation.MedApplication;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -59,6 +59,7 @@ public abstract class Fragment<C extends Fragment, B extends ViewDataBinding, VM
     @Override
     public final void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(getMenu() != 0);
     }
 
     @Override
@@ -132,10 +133,10 @@ public abstract class Fragment<C extends Fragment, B extends ViewDataBinding, VM
         if (viewModel != null) {
             viewModel.onDestroy();
         }
-        MedApplication.getInstance().refWatcher().watch(this);
-        if (viewModel != null) {
-            MedApplication.getInstance().refWatcher().watch(viewModel);
-        }
+//        MedApplication.getInstance().refWatcher().watch(this);
+//        if (viewModel != null) {
+//            MedApplication.getInstance().refWatcher().watch(viewModel);
+//        }
     }
 
     @Override
@@ -144,6 +145,29 @@ public abstract class Fragment<C extends Fragment, B extends ViewDataBinding, VM
             viewModel.onSaveInstanceState(outState);
         }
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public final void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        @MenuRes int menuId = getMenu();
+        if (menuId != 0) {
+            inflater.inflate(menuId, menu);
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public final void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if (viewModel != null) {
+            viewModel.onPrepareOptionsMenu(menu);
+        }
+    }
+
+    @Override
+    public final boolean onOptionsItemSelected(MenuItem item) {
+        return viewModel.onOptionsItemSelected(item)
+                || super.onOptionsItemSelected(item);
     }
 
     @Override

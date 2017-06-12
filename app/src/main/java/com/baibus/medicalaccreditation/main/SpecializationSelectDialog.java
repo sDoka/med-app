@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 
 import com.baibus.medicalaccreditation.base.DialogFragment;
 
+import static com.baibus.medicalaccreditation.main.SpecializationSelectDialogVM.ARGUMENT_IS_NEED;
+
 /**
  * Created by Android Studio.
  * User: yanbaev.is
@@ -18,10 +20,10 @@ public class SpecializationSelectDialog extends DialogFragment<SpecializationSel
 
     public static final String TAG = SpecializationSelectDialog.class.getName();
 
-    public static SpecializationSelectDialog newInstance() {
+    public static SpecializationSelectDialog newInstance(boolean need) {
 
         Bundle args = new Bundle();
-
+        args.putBoolean(ARGUMENT_IS_NEED, need);
         SpecializationSelectDialog fragment = new SpecializationSelectDialog();
         fragment.setArguments(args);
         return fragment;

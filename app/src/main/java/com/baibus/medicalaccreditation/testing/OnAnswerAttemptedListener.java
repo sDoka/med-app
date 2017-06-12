@@ -10,5 +10,5 @@ import com.baibus.medicalaccreditation.common.db.entities.Answer;
  * To change this template use File | settings | File Templates.
  */
 public interface OnAnswerAttemptedListener {
-    void onAnswerAttempted(Answer answer, int position);
+    void onAnswerAttempted(Answer answer);
 }

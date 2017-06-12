@@ -1,4 +1,4 @@
-package com.baibus.medicalaccreditation.testing;
+package com.baibus.medicalaccreditation.result;
 
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableInt;
@@ -9,16 +9,18 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.baibus.medicalaccreditation.R;
 import com.baibus.medicalaccreditation.BR;
+import com.baibus.medicalaccreditation.R;
 import com.baibus.medicalaccreditation.base.ActivityVM;
 import com.baibus.medicalaccreditation.base.FragmentVM;
 import com.baibus.medicalaccreditation.base.FragmentVMFactory;
 import com.baibus.medicalaccreditation.base.RxLoader;
 import com.baibus.medicalaccreditation.common.db.entities.Answer;
+import com.baibus.medicalaccreditation.common.db.entities.Attempt;
 import com.baibus.medicalaccreditation.common.db.entities.Question;
 import com.baibus.medicalaccreditation.common.db.entities.Specialization;
 import com.baibus.medicalaccreditation.common.db.tables.AnswerTable;
+import com.baibus.medicalaccreditation.common.db.tables.AttemptTable;
 import com.baibus.medicalaccreditation.common.db.tables.QuestionTable;
 import com.baibus.medicalaccreditation.common.provider.ApiModule;
 import com.pushtorefresh.storio.StorIOException;
@@ -26,7 +28,6 @@ import com.pushtorefresh.storio.StorIOException;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import me.tatarka.bindingcollectionadapter2.BindingViewPagerAdapter;
@@ -43,8 +44,8 @@ import rx.schedulers.Schedulers;
  * Time: 8:27
  * To change this template use File | settings | File Templates.
  */
-public class TestingVM extends FragmentVM<TestingFragment> implements OnQuestionAttemptedListener {
-    private final static String TAG = TestingVM.class.getSimpleName();
+public class ResultVM extends FragmentVM<ResultFragment> {
+    private final static String TAG = ResultVM.class.getSimpleName();
 
     private final static String BUNDLE_ITEMS = "items";
     private final static String BUNDLE_POSITION = "position";
@@ -52,9 +53,9 @@ public class TestingVM extends FragmentVM<TestingFragment> implements OnQuestion
     private final static int LOADER_GET_QUESTIONS = 0;
 
     public final ObservableInt position = new ObservableInt();
-    public final ObservableArrayList<QuestionVM> items = new ObservableArrayList<>();
-    public final ItemBinding<QuestionVM> itemBinding = ItemBinding.of(BR.itemViewModel, R.layout.item_question);
-    public final BindingViewPagerAdapter.PageTitles<QuestionVM> pageTitles = (position, item) -> "Вопрос " + item.question.get().getIndex();
+    public final ObservableArrayList<ResultQuestionVM> items = new ObservableArrayList<>();
+    public final ItemBinding<ResultQuestionVM> itemBinding = ItemBinding.of(BR.itemViewModel, R.layout.item_result_question);
+    public final BindingViewPagerAdapter.PageTitles<ResultQuestionVM> pageTitles = (position, item) -> "Вопрос " + item.question.get().getIndex();
     private final OnPropertyChangedCallback mSpecializationChanged = new OnPropertyChangedCallback() {
         @Override
         public void onPropertyChanged(android.databinding.Observable observable, int property) {
@@ -62,9 +63,9 @@ public class TestingVM extends FragmentVM<TestingFragment> implements OnQuestion
         }
     };
 
-    private TestingVM(TestingFragment fragment, @NonNull Bundle savedInstanceState) {
+    private ResultVM(ResultFragment fragment, @NonNull Bundle savedInstanceState) {
         super(fragment, savedInstanceState);
-        ArrayList<QuestionVM> questionArrayList = Parcels
+        ArrayList<ResultQuestionVM> questionArrayList = Parcels
                 .unwrap(savedInstanceState.getParcelable(BUNDLE_ITEMS));
         if (questionArrayList != null) setItems(questionArrayList);
         position.set(savedInstanceState.getInt(BUNDLE_POSITION));
@@ -85,19 +86,10 @@ public class TestingVM extends FragmentVM<TestingFragment> implements OnQuestion
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        ArrayList<QuestionVM> it = new ArrayList<>(items.size());
+        ArrayList<ResultQuestionVM> it = new ArrayList<>(items.size());
         it.addAll(items);
         outState.putParcelable(BUNDLE_ITEMS, Parcels.wrap(it));
         outState.putInt(BUNDLE_POSITION, position.get());
-    }
-
-    @Override
-    public void onQuestionAttempted(Question question, int position) {
-        if (position == items.size() - 1) {
-            fragment.showResult();
-        } else {
-            fragment.setCurrentItem(position + 1, true);
-        }
     }
 
     @Override
@@ -116,10 +108,7 @@ public class TestingVM extends FragmentVM<TestingFragment> implements OnQuestion
         return super.onOptionsItemSelected(item);
     }
 
-    private void setItems(List<QuestionVM> questions) {
-        for (QuestionVM question: questions) {
-            question.setListener(this);
-        }
+    private void setItems(List<ResultQuestionVM> questions) {
         this.items.clear();
         this.items.addAll(questions);
         if (!this.items.isEmpty()) {
@@ -144,7 +133,7 @@ public class TestingVM extends FragmentVM<TestingFragment> implements OnQuestion
         );
     }
 
-    private static Observable<List<QuestionVM>> getObservableQuestions(Specialization specialization) {
+    private static Observable<List<ResultQuestionVM>> getObservableQuestions(Specialization specialization) {
         return Observable
                 .defer(() -> {
                     Log.d(TAG, "INNER LOADER_GET_QUESTIONS" + ActivityVM.isMainLooper());
@@ -155,8 +144,8 @@ public class TestingVM extends FragmentVM<TestingFragment> implements OnQuestion
                             return ApiModule
                                     .getStoreIOSQLite()
                                     .get()
-                                    .listOfObjects(Question.class)
-                                    .withQuery(QuestionTable.queryNotAttempted(specialization.getId()))
+                                    .listOfObjects(Attempt.class)
+                                    .withQuery(AttemptTable.querySpecializationId(specialization.getId()))
                                     .prepare()
                                     .asRxObservable();
                         }
@@ -164,36 +153,44 @@ public class TestingVM extends FragmentVM<TestingFragment> implements OnQuestion
                         return Observable.error(e);
                     }
                 })
-                .map(questions -> {
-                    List<QuestionVM> result = new ArrayList<>();
-                    for (int i = 0, questionsSize = questions.size(); i < questionsSize; i++) {
-                        Question question = questions.get(i);
-                        ArrayList<Answer> answers = new ArrayList<>();
-                        answers.addAll(ApiModule
+                .map(attempts -> {
+                    List<ResultQuestionVM> result = new ArrayList<>();
+                    for (int i = 0, attemptsSize = attempts.size(); i < attemptsSize; i++) {
+                        Attempt attempt = attempts.get(i);
+                        Question question = ApiModule
                                 .getStoreIOSQLite()
                                 .get()
-                                .listOfObjects(Answer.class)
-                                .withQuery(AnswerTable.queryQuestionId(question.getId()))
+                                .object(Question.class)
+                                .withQuery(QuestionTable.queryId(attempt.getQuestionId()))
                                 .prepare()
-                                .executeAsBlocking());
-                        Collections.shuffle(answers);
-                        result.add(new QuestionVM(i, question, answers));
+                                .executeAsBlocking();
+                        ArrayList<Answer> answers = new ArrayList<>();
+                        if (question != null) {
+                            answers.addAll(ApiModule
+                                    .getStoreIOSQLite()
+                                    .get()
+                                    .listOfObjects(Answer.class)
+                                    .withQuery(AnswerTable.queryQuestionId(question.getId()))
+                                    .prepare()
+                                    .executeAsBlocking());
+                            result.add(new ResultQuestionVM(question, answers, attempt));
+                        }
                     }
                     return result;
                 });
     }
 
-    static class FactoryVM implements FragmentVMFactory<TestingVM, TestingFragment> {
+    static class FactoryVM implements FragmentVMFactory<ResultVM, ResultFragment> {
         @NonNull
         @Override
-        public TestingVM create(TestingFragment view) {
-            return new TestingVM(view, view.getArguments());
+        public ResultVM create(ResultFragment view) {
+            return new ResultVM(view, view.getArguments());
         }
 
         @NonNull
         @Override
-        public TestingVM restore(TestingFragment view, @NonNull Bundle savedInstanceState) {
-            return new TestingVM(view, savedInstanceState);
+        public ResultVM restore(ResultFragment view, @NonNull Bundle savedInstanceState) {
+            return new ResultVM(view, savedInstanceState);
         }
     }
 }
