@@ -86,6 +86,7 @@ public class MainVM extends ActivityVM<MainActivity> {
     }
 
     public void changeSpecialization() {
+        activity.binding.drawerLayout.closeDrawer(START);
         changeSpecialization(false);
     }
 
@@ -106,7 +107,7 @@ public class MainVM extends ActivityVM<MainActivity> {
         switch (item.getItemId()) {
             case R.id.change_spec:
                 activity.binding.drawerLayout.closeDrawer(START);
-                changeSpecialization();
+                changeSpecialization(false);
                 return true;
             case R.id.logout:
                 activity.startActivity(AuthActivity.getStartIntent());

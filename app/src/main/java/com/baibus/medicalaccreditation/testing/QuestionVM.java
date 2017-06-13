@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import me.tatarka.bindingcollectionadapter2.ItemBinding;
+import me.tatarka.bindingcollectionadapter2.OnItemBind;
 
 /**
  * Created by Android Studio.
@@ -35,13 +35,14 @@ import me.tatarka.bindingcollectionadapter2.ItemBinding;
 public class QuestionVM extends BaseObservable implements OnAnswerAttemptedListener {
     @Transient
     private WeakReference<OnQuestionAttemptedListener> mListener = new WeakReference<>(null);
-    public final ObservableInt position = new ObservableInt();
+    private final ObservableInt position = new ObservableInt();
     public final ObservableField<Question> question = new ObservableField<>();
     public final ObservableArrayList<Answer> answers = new ObservableArrayList<>();
     @Transient
-    public final ItemBinding<Answer> itemBinding = ItemBinding
-            .<Answer>of(BR.itemViewModel, R.layout.item_answer)
-            .bindExtra(BR.listener, QuestionVM.this);
+    public final OnItemBind<Answer> itemBinding =
+            (itemBinding, position, item) -> itemBinding.set(BR.itemViewModel, R.layout.item_answer)
+                    .bindExtra(BR.listener, QuestionVM.this)
+                    .bindExtra(BR.index, position + 1);
 
     @ParcelConstructor
     QuestionVM(@ParcelProperty("position") int position,

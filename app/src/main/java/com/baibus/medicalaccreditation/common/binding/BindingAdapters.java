@@ -22,6 +22,7 @@ import com.baibus.medicalaccreditation.BR;
 import com.baibus.medicalaccreditation.R;
 import com.baibus.medicalaccreditation.databinding.PartialNavHeaderMainBinding;
 import com.baibus.medicalaccreditation.main.MainVM;
+import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.lang.ref.WeakReference;
@@ -84,6 +85,15 @@ public class BindingAdapters {
     @BindingAdapter({"progressBarImage"})
     public static void bindProgressBarImage(SimpleDraweeView view, Drawable progressBarImage) {
         view.getHierarchy().setProgressBarImage(progressBarImage);
+    }
+
+    @BindingAdapter(value = {"cornerRadius", "cornerTopLeft", "cornerTopRight", "cornerBottomRight", "cornerBottomLeft"}, requireAll = false)
+    public static void bindRoundFresco(SimpleDraweeView view, float radius, boolean topLeft, boolean topRight, boolean bottomRight, boolean bottomLeft) {
+        RoundingParams roundingParams = view.getHierarchy().getRoundingParams();
+        if (roundingParams == null) roundingParams = RoundingParams.fromCornersRadius(radius);
+        roundingParams.setCornersRadii(topLeft ? radius : 0f, topRight ? radius : 0f,
+                bottomRight ? radius : 0f, bottomLeft ? radius : 0f);
+        view.getHierarchy().setRoundingParams(roundingParams);
     }
 
     @BindingAdapter({"model"})

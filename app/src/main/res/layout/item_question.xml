@@ -24,9 +24,8 @@
         android:layout_height="match_parent"
         app:cardBackgroundColor="@android:color/white"
         app:cardCornerRadius="8dp"
-        app:cardElevation="8dp"
-        app:cardUseCompatPadding="true"
-        android:foreground="?android:attr/selectableItemBackground">
+        app:cardElevation="4dp"
+        app:cardUseCompatPadding="true">
 
         <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"

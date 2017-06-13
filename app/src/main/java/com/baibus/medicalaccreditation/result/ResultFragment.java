@@ -3,7 +3,6 @@ package com.baibus.medicalaccreditation.result;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewPager;
 
 import com.baibus.medicalaccreditation.BR;
 import com.baibus.medicalaccreditation.R;
@@ -57,18 +56,18 @@ public class ResultFragment extends Fragment<ResultFragment, FragmentResultBindi
 
     @Override
     protected void onCreatedVM() {
-        initPager();
+
     }
 
     @Override
     protected void onRestoredVM() {
-        initPager();
+
     }
 
-    private void initPager() {
-        binding.viewPager.addOnPageChangeListener(new OnPageChangeListener(this));
-        binding.viewPager.setCurrentItem(viewModel.position.get(), false);
-    }
+//    private void initPager() {
+//        binding.viewPager.addOnPageChangeListener(new OnPageChangeListener(this));
+//        binding.viewPager.setCurrentItem(viewModel.position.get(), false);
+//    }
 
     void startTestAgain() {
         Activity activity = getActivity();
@@ -82,32 +81,32 @@ public class ResultFragment extends Fragment<ResultFragment, FragmentResultBindi
         return R.menu.fragment_result;
     }
 
-    private static class OnPageChangeListener implements ViewPager.OnPageChangeListener {
-        private final WeakReference<ResultFragment> mResultFragment;
-
-        OnPageChangeListener(ResultFragment resultFragment) {
-            mResultFragment = new WeakReference<>(resultFragment);
-        }
-
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-            final ResultFragment resultFragment = mResultFragment.get();
-            if (resultFragment != null) {
-                final ResultVM testingVM = resultFragment.viewModel;
-                if (testingVM != null && testingVM.position.get() != position) {
-                    testingVM.setTitle(position);
-                }
-            }
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-
-        }
-    }
+//    private static class OnPageChangeListener implements ViewPager.OnPageChangeListener {
+//        private final WeakReference<ResultFragment> mResultFragment;
+//
+//        OnPageChangeListener(ResultFragment resultFragment) {
+//            mResultFragment = new WeakReference<>(resultFragment);
+//        }
+//
+//        @Override
+//        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+//
+//        }
+//
+//        @Override
+//        public void onPageSelected(int position) {
+//            final ResultFragment resultFragment = mResultFragment.get();
+//            if (resultFragment != null) {
+//                final ResultVM testingVM = resultFragment.viewModel;
+//                if (testingVM != null && testingVM.position.get() != position) {
+//                    testingVM.setTitle(position);
+//                }
+//            }
+//        }
+//
+//        @Override
+//        public void onPageScrollStateChanged(int state) {
+//
+//        }
+//    }
 }

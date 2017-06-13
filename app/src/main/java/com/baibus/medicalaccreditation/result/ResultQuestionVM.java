@@ -37,7 +37,8 @@ public class ResultQuestionVM extends BaseObservable {
     @Transient
     public final OnItemBind<Answer> itemBinding =
             (itemBinding, position, item) -> itemBinding.set(BR.itemViewModel, R.layout.item_result_answer)
-                    .bindExtra(BR.resultAnswerId, attempt.get() == null ? -1L: attempt.get().getAnswerId());
+                    .bindExtra(BR.resultAnswerId, attempt.get() == null ? -1L: attempt.get().getAnswerId())
+                    .bindExtra(BR.index, position + 1);
 
     @ParcelConstructor
     ResultQuestionVM(@ParcelProperty("question") Question question,

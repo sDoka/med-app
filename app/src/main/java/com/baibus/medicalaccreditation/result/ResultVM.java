@@ -1,7 +1,6 @@
 package com.baibus.medicalaccreditation.result;
 
 import android.databinding.ObservableArrayList;
-import android.databinding.ObservableInt;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -30,7 +29,6 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.tatarka.bindingcollectionadapter2.BindingViewPagerAdapter;
 import me.tatarka.bindingcollectionadapter2.ItemBinding;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -48,18 +46,17 @@ public class ResultVM extends FragmentVM<ResultFragment> {
     private final static String TAG = ResultVM.class.getSimpleName();
 
     private final static String BUNDLE_ITEMS = "items";
-    private final static String BUNDLE_POSITION = "position";
 
     private final static int LOADER_GET_QUESTIONS = 0;
 
-    public final ObservableInt position = new ObservableInt();
     public final ObservableArrayList<ResultQuestionVM> items = new ObservableArrayList<>();
     public final ItemBinding<ResultQuestionVM> itemBinding = ItemBinding.of(BR.itemViewModel, R.layout.item_result_question);
-    public final BindingViewPagerAdapter.PageTitles<ResultQuestionVM> pageTitles = (position, item) -> "Вопрос " + item.question.get().getIndex();
+//    public final BindingViewPagerAdapter.PageTitles<ResultQuestionVM> pageTitles = (position, item) -> "Вопрос " + item.question.get().getIndex();
     private final OnPropertyChangedCallback mSpecializationChanged = new OnPropertyChangedCallback() {
         @Override
         public void onPropertyChanged(android.databinding.Observable observable, int property) {
             loadQuestions(true);
+//            loadStatistics(true);
         }
     };
 
@@ -68,20 +65,21 @@ public class ResultVM extends FragmentVM<ResultFragment> {
         ArrayList<ResultQuestionVM> questionArrayList = Parcels
                 .unwrap(savedInstanceState.getParcelable(BUNDLE_ITEMS));
         if (questionArrayList != null) setItems(questionArrayList);
-        position.set(savedInstanceState.getInt(BUNDLE_POSITION));
         specialization.addOnPropertyChangedCallback(mSpecializationChanged);
+        setTitle("Результаты");
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (items.isEmpty()) loadQuestions(false);
+//        if (items.isEmpty()) loadStatistics(false);
     }
 
-    public void setTitle(int position) {
-        setTitle(pageTitles.getPageTitle(position, items.get(position)));
-        this.position.set(position);
-    }
+//    public void setTitle(int position) {
+//        setTitle(pageTitles.getPageTitle(position, items.get(position)));
+//        this.position.set(position);
+//    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -89,7 +87,6 @@ public class ResultVM extends FragmentVM<ResultFragment> {
         ArrayList<ResultQuestionVM> it = new ArrayList<>(items.size());
         it.addAll(items);
         outState.putParcelable(BUNDLE_ITEMS, Parcels.wrap(it));
-        outState.putInt(BUNDLE_POSITION, position.get());
     }
 
     @Override
@@ -111,9 +108,23 @@ public class ResultVM extends FragmentVM<ResultFragment> {
     private void setItems(List<ResultQuestionVM> questions) {
         this.items.clear();
         this.items.addAll(questions);
-        if (!this.items.isEmpty()) {
-            setTitle(this.position.get());
-        }
+    }
+
+    private void loadStatistics(boolean restart) {
+        fragment.addSubscription(
+                getObservableQuestions(specialization.get())
+                        .subscribeOn(Schedulers.from(AsyncTask.THREAD_POOL_EXECUTOR))
+                        .observeOn(AndroidSchedulers.from(fragment.mainHandler.getLooper()))
+                        .compose(RxLoader.from(this, LOADER_GET_QUESTIONS, restart))
+                        .doOnSubscribe(() -> isShowProgress.set(true))
+                        .subscribe(value -> {
+                            isShowProgress.set(false);
+                            setItems(value);
+                        }, throwable -> {
+                            isShowProgress.set(false);
+                            throw Exceptions.propagate(throwable);
+                        })
+        );
     }
 
     private void loadQuestions(boolean restart) {

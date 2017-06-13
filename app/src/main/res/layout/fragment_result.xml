@@ -6,6 +6,7 @@
 
     <data>
         <import type="android.view.View" alias="view"/>
+        <import type="me.tatarka.bindingcollectionadapter2.LayoutManagers" />
         <variable name="viewModel" type="com.baibus.medicalaccreditation.result.ResultVM"/>
     </data>
 
@@ -13,13 +14,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/view_pager"
+        <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:itemBinding="@{viewModel.itemBinding}"
+            app:layoutManager="@{LayoutManagers.linear()}"
             app:items="@{viewModel.items}"
-            app:pageTitles="@{viewModel.pageTitles}"/>
+            app:itemBinding="@{viewModel.itemBinding}"
+            tools:listitem="@layout/item_result_question"/>
 
         <ProgressBar
             style="?android:attr/progressBarStyleLarge"
